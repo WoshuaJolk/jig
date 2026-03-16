@@ -12,9 +12,7 @@ export async function GET(
     return NextResponse.json({ error: "Split not found" }, { status: 404 });
   }
 
-  // Strip adminToken from public response
-  const { adminToken: _, ...publicSplit } = split;
-  return NextResponse.json(publicSplit);
+  return NextResponse.json(split);
 }
 
 export async function PUT(
@@ -30,11 +28,6 @@ export async function PUT(
 
   const body = await req.json();
 
-  // Verify admin token
-  if (body.adminToken !== split.adminToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
   const updated = {
     ...split,
     title: body.title ?? split.title,
@@ -43,6 +36,7 @@ export async function PUT(
     taxPercent: body.taxPercent ?? split.taxPercent,
     tipPercent: body.tipPercent ?? split.tipPercent,
     subtotal: body.subtotal ?? split.subtotal,
+    venmo: body.venmo ?? split.venmo,
   };
 
   saveSplit(updated);

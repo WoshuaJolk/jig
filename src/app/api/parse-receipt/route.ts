@@ -1,4 +1,3 @@
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
@@ -8,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { image } = await req.json();
 
     const { object } = await generateObject({
-      model: anthropic("claude-sonnet-4-6-20250514"),
+      model: "anthropic/claude-sonnet-4.6",
       messages: [
         {
           role: "user",
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
             },
             {
               type: "text",
-              text: "Parse this receipt. Extract the restaurant/store name as the title, and every line item with its name and price. Only include individual items, not subtotals, tax, tip, or totals. Return the data as JSON.",
+              text: "Parse this receipt. Extract the restaurant/store name as the title, and every line item with its name and price. Only include individual items, not subtotals, tax, tip, or totals. If tax and tip amounts are shown on the receipt, extract those too as dollar amounts.",
             },
           ],
         },
@@ -32,6 +31,8 @@ export async function POST(req: NextRequest) {
             price: z.number().describe("Item price in dollars"),
           })
         ),
+        tax: z.number().nullable().describe("Tax amount in dollars if shown on receipt, null otherwise"),
+        tip: z.number().nullable().describe("Tip amount in dollars if shown on receipt, null otherwise"),
       }),
     });
 

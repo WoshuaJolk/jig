@@ -13,7 +13,7 @@ export interface Split {
   taxPercent: number;
   tipPercent: number;
   subtotal: number;
-  adminToken: string;
+  venmo: string;
   createdAt: string;
 }
 

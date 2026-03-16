@@ -14,14 +14,11 @@ export async function POST(req: NextRequest) {
     taxPercent: body.taxPercent || 0,
     tipPercent: body.tipPercent || 0,
     subtotal: body.subtotal || 0,
-    adminToken: randomUUID(),
+    venmo: body.venmo || "",
     createdAt: new Date().toISOString(),
   };
 
   saveSplit(split);
 
-  return NextResponse.json({
-    id: split.id,
-    adminToken: split.adminToken,
-  });
+  return NextResponse.json({ id: split.id });
 }
