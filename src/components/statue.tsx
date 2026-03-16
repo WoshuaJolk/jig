@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ASCIIEffect } from "./asciieffect";
 
 export function Statue({ className = "" }: { className?: string }) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -9,7 +10,8 @@ export function Statue({ className = "" }: { className?: string }) {
   useEffect(() => {
     let isMounted = true;
     let renderer: import("three").WebGLRenderer | undefined;
-    let animId: number | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let composer: any = null;
     let cleanupScene: (() => void) | undefined;
 
     const currentRef = mountRef.current;
@@ -17,23 +19,28 @@ export function Statue({ className = "" }: { className?: string }) {
 
     const initScene = async () => {
       try {
-        const w = currentRef.clientWidth;
-        const h = currentRef.clientHeight;
-        if (w < 10 || h < 10) return;
+        if (currentRef.clientWidth < 10 || currentRef.clientHeight < 10) return;
 
         const THREE = await import("three");
-        const { STLLoader } = await import("three/addons/loaders/STLLoader.js");
-        const { OrbitControls } =
-          await import("three/addons/controls/OrbitControls.js");
-
-        let useAscii = false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let composer: any = null;
+        const STLLoader = await import(
+          "three/addons/loaders/STLLoader.js"
+        ).then((mod) => mod.STLLoader);
+        const OrbitControls = await import(
+          "three/addons/controls/OrbitControls.js"
+        ).then((mod) => mod.OrbitControls);
+        const { EffectComposer, RenderPass, EffectPass } =
+          await import("postprocessing");
 
         if (!isMounted) return;
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          currentRef.clientWidth / currentRef.clientHeight,
+          0.1,
+          1000
+        );
         camera.position.set(0, 8, 1);
 
         renderer = new THREE.WebGLRenderer({
@@ -42,8 +49,7 @@ export function Statue({ className = "" }: { className?: string }) {
           premultipliedAlpha: false,
         });
         renderer.setClearColor(0x000000, 0);
-        renderer.setSize(w, h);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(currentRef.clientWidth, currentRef.clientHeight);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.NoToneMapping;
         const gl = renderer.getContext();
@@ -52,11 +58,15 @@ export function Statue({ className = "" }: { className?: string }) {
             "srgb";
         }
         currentRef.appendChild(renderer.domElement);
-        renderer.domElement.style.display = "block";
         renderer.domElement.style.touchAction = "none";
         renderer.domElement.style.mixBlendMode = "darken";
 
-        // OrbitControls — horizontal only, no zoom/pan
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xf0f0f0, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
@@ -64,63 +74,43 @@ export function Statue({ className = "" }: { className?: string }) {
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableZoom = false;
         controls.enablePan = false;
+        controls.enabled = true;
 
-        // Block wheel/pinch on canvas
-        const blockWheel = (e: WheelEvent) => {
-          e.preventDefault();
-          e.stopPropagation();
+        const handleWheel = (event: WheelEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
         };
-        const blockPinch = (e: TouchEvent) => {
-          if (e.touches.length > 1) {
-            e.preventDefault();
-            e.stopPropagation();
+        const handleTouchMove = (event: TouchEvent) => {
+          if (event.touches.length > 1) {
+            event.preventDefault();
+            event.stopPropagation();
           }
         };
-        renderer.domElement.addEventListener("wheel", blockWheel, {
+        renderer.domElement.addEventListener("wheel", handleWheel, {
           passive: false,
         });
-        renderer.domElement.addEventListener("touchmove", blockPinch, {
+        renderer.domElement.addEventListener("touchmove", handleTouchMove, {
           passive: false,
         });
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-        const dirLight = new THREE.DirectionalLight(0xf0f0f0, 0.8);
-        dirLight.position.set(1, 1, 1);
-        scene.add(dirLight);
+        composer = new EffectComposer(renderer, {
+          frameBufferType: THREE.UnsignedByteType,
+          alpha: true,
+        });
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        const asciiEffect = new ASCIIEffect({ backgroundColor: "#f7f7f6" });
+        const effectPass = new EffectPass(camera, asciiEffect);
+        effectPass.renderToScreen = true;
+        composer.addPass(effectPass);
 
-        // ASCII post-processing
-        try {
-          try {
-            const font = new FontFace("ReceiptASCII", "url(/Receipt.otf)");
-            const loaded = await font.load();
-            document.fonts.add(loaded);
-          } catch {
-            /* fallback */
-          }
-
-          const { EffectComposer, RenderPass, EffectPass } =
-            await import("postprocessing");
-          const { ASCIIEffect } = await import("./asciieffect");
-
-          composer = new EffectComposer(renderer, {
-            frameBufferType: THREE.UnsignedByteType,
-            alpha: true,
-          });
-          composer.addPass(new RenderPass(scene, camera));
-
-          const ascii = new ASCIIEffect({
-            backgroundColor: "#f7f7f6",
-            color: "#8a8a8a",
-            fontFamily: "ReceiptASCII, monospace",
-            cellSize: 2,
-          });
-          const fxPass = new EffectPass(camera, ascii);
-          fxPass.renderToScreen = true;
-          composer.addPass(fxPass);
-          useAscii = true;
-        } catch (e) {
-          console.error("[Statue] ASCII effect failed:", e);
-        }
+        const animate = () => {
+          if (!isMounted || !composer) return;
+          requestAnimationFrame(animate);
+          controls.update();
+          composer.render();
+        };
+        animate();
 
         const loader = new STLLoader();
         loader.load(
@@ -134,57 +124,61 @@ export function Statue({ className = "" }: { className?: string }) {
               shininess: 80,
             });
             const mesh = new THREE.Mesh(geometry, material);
+
             mesh.geometry.center();
             geometry.computeBoundingBox();
-            const bb = geometry.boundingBox!;
-            const modelH = bb.max.y - bb.min.y;
-            mesh.position.set(0, modelH * 0.05, 0);
+            const boundingBox = geometry.boundingBox;
+            if (!boundingBox) return;
+
+            const modelHeight = boundingBox.max.y - boundingBox.min.y;
+            mesh.position.set(0, modelHeight * 0.05, 0);
+
             const maxDim = Math.max(
-              bb.max.x - bb.min.x,
-              bb.max.y - bb.min.y,
-              bb.max.z - bb.min.z,
+              boundingBox.max.x - boundingBox.min.x,
+              boundingBox.max.y - boundingBox.min.y,
+              boundingBox.max.z - boundingBox.min.z
             );
-            mesh.scale.setScalar(8 / maxDim);
+            const scale = 8 / maxDim;
+            mesh.scale.set(scale, scale, scale);
             scene.add(mesh);
 
-            const animate = () => {
-              if (!isMounted) return;
-              animId = requestAnimationFrame(animate);
+            const animateModel = () => {
+              if (!isMounted || !composer) return;
+              requestAnimationFrame(animateModel);
               mesh.rotation.y += 0.005;
               controls.update();
-              if (useAscii && composer) {
-                composer.render();
-              } else {
-                renderer!.render(scene, camera);
-              }
+              composer.render();
             };
-            animate();
+            animateModel();
           },
           undefined,
-          (err: unknown) => {
-            console.error("[Statue] STL load error:", err);
-            if (isMounted) setError(`Model load failed: ${String(err)}`);
-          },
+          (errorEvent: unknown) => {
+            if (!isMounted) return;
+            setError(`Failed to load 3D model: ${String(errorEvent)}`);
+          }
         );
 
-        const onResize = () => {
-          if (!isMounted || !renderer) return;
-          const nw = currentRef.clientWidth;
-          const nh = currentRef.clientHeight;
-          camera.aspect = nw / nh;
+        const handleResize = () => {
+          if (!isMounted || !renderer || !camera || !composer) return;
+          camera.aspect = currentRef.clientWidth / currentRef.clientHeight;
           camera.updateProjectionMatrix();
-          renderer.setSize(nw, nh);
-          composer?.setSize(nw, nh);
+          renderer.setSize(currentRef.clientWidth, currentRef.clientHeight);
+          composer.setSize(currentRef.clientWidth, currentRef.clientHeight);
         };
-        window.addEventListener("resize", onResize);
+
+        window.addEventListener("resize", handleResize);
         cleanupScene = () => {
-          window.removeEventListener("resize", onResize);
-          renderer?.domElement.removeEventListener("wheel", blockWheel);
-          renderer?.domElement.removeEventListener("touchmove", blockPinch);
+          window.removeEventListener("resize", handleResize);
+          renderer?.domElement.removeEventListener("wheel", handleWheel);
+          renderer?.domElement.removeEventListener(
+            "touchmove",
+            handleTouchMove
+          );
         };
       } catch (err) {
-        console.error("[Statue] init failed:", err);
-        if (isMounted) setError(`Init failed: ${String(err)}`);
+        if (isMounted) {
+          setError(`Failed to initialize 3D viewer: ${String(err)}`);
+        }
       }
     };
 
@@ -192,22 +186,23 @@ export function Statue({ className = "" }: { className?: string }) {
 
     return () => {
       isMounted = false;
-      if (animId) cancelAnimationFrame(animId);
       cleanupScene?.();
+
       if (renderer?.domElement && currentRef.contains(renderer.domElement)) {
         currentRef.removeChild(renderer.domElement);
       }
+
       renderer?.dispose();
     };
   }, []);
 
   return (
     <div ref={mountRef} className={`overflow-hidden ${className}`}>
-      {error && (
-        <div className="flex h-full items-center justify-center text-xs text-red-500">
+      {error ? (
+        <div className="flex h-full items-center justify-center text-xs text-red-400">
           {error}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

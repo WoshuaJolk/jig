@@ -1,10 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import { ReceiptItem } from "@/lib/types";
+import { ActionButton } from "@/components/ActionButton";
+import { Avatar } from "@/components/Avatar";
+import { ItemsList } from "@/components/ItemsList";
+import { FooterLink, PageFooter } from "@/components/PageFooter";
+import { PageHeader } from "@/components/PageHeader";
+import { PeopleList } from "@/components/PeopleList";
 import { Shell } from "@/components/shell";
-import { TrashIcon } from "@heroicons/react/20/solid";
+import { TotalsSection } from "@/components/TotalsSection";
+import { ReceiptItem } from "@/lib/types";
+import { fmt, generateId, num } from "@/lib/utils";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SplitData {
   id: string;
@@ -15,10 +22,11 @@ interface SplitData {
   tipPercent: number;
   subtotal: number;
   venmo: string;
+  receiptUrl: string;
 }
 
 interface PersonBreakdown {
-  items: { name: string; price: number; split: number }[];
+  items: { name: string; price: number; split: number; splitCount: number }[];
   itemsTotal: number;
   tax: number;
   tip: number;
@@ -32,6 +40,7 @@ function calcBreakdown(split: SplitData, person: string): PersonBreakdown {
       name: i.name,
       price: i.price,
       split: i.price / i.assignedTo.length,
+      splitCount: i.assignedTo.length,
     }));
   const itemsTotal = items.reduce((s, i) => s + i.split, 0);
   const proportion = split.subtotal > 0 ? itemsTotal / split.subtotal : 0;
@@ -40,21 +49,122 @@ function calcBreakdown(split: SplitData, person: string): PersonBreakdown {
   return { items, itemsTotal, tax, tip, total: itemsTotal + tax + tip };
 }
 
-function generateId() {
-  return Math.random().toString(36).slice(2, 9);
-}
-
-function num(val: string): number {
-  const n = parseFloat(val);
-  return isNaN(n) ? 0 : n;
-}
-
-function fmt(n: number): string {
-  return "$" + n.toFixed(2);
-}
-
 function venmoPayUrl(username: string, amount: number, note: string): string {
   return `https://venmo.com/${encodeURIComponent(username)}?txn=pay&amount=${amount.toFixed(2)}&note=${encodeURIComponent(note)}`;
+}
+
+function ReceiptViewer({ src, onClose }: { src: string; onClose: () => void }) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [translate, setTranslate] = useState({ x: 0, y: 0 });
+  const gestureRef = useRef({
+    startScale: 1,
+    startDist: 0,
+    startX: 0,
+    startY: 0,
+    startTx: 0,
+    startTy: 0,
+  });
+
+  const getDistance = (t1: React.Touch, t2: React.Touch) =>
+    Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+  const getMidpoint = (t1: React.Touch, t2: React.Touch) => ({
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2,
+  });
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = getDistance(e.touches[0], e.touches[1]);
+      const mid = getMidpoint(e.touches[0], e.touches[1]);
+      gestureRef.current = {
+        startScale: scale,
+        startDist: dist,
+        startX: mid.x,
+        startY: mid.y,
+        startTx: translate.x,
+        startTy: translate.y,
+      };
+    } else if (e.touches.length === 1 && scale > 1) {
+      gestureRef.current = {
+        ...gestureRef.current,
+        startX: e.touches[0].clientX,
+        startY: e.touches[0].clientY,
+        startTx: translate.x,
+        startTy: translate.y,
+      };
+    }
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = getDistance(e.touches[0], e.touches[1]);
+      const newScale = Math.min(
+        Math.max(
+          gestureRef.current.startScale * (dist / gestureRef.current.startDist),
+          1,
+        ),
+        5,
+      );
+      const mid = getMidpoint(e.touches[0], e.touches[1]);
+      setScale(newScale);
+      setTranslate({
+        x: gestureRef.current.startTx + (mid.x - gestureRef.current.startX),
+        y: gestureRef.current.startTy + (mid.y - gestureRef.current.startY),
+      });
+    } else if (e.touches.length === 1 && scale > 1) {
+      setTranslate({
+        x:
+          gestureRef.current.startTx +
+          (e.touches[0].clientX - gestureRef.current.startX),
+        y:
+          gestureRef.current.startTy +
+          (e.touches[0].clientY - gestureRef.current.startY),
+      });
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (scale <= 1) {
+      setScale(1);
+      setTranslate({ x: 0, y: 0 });
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-50 bg-black flex flex-col"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      <div className="flex justify-end p-4">
+        <button
+          onClick={onClose}
+          className="text-white text-sm uppercase tracking-widest"
+        >
+          Close
+        </button>
+      </div>
+      <div className="flex-1 overflow-hidden flex items-center justify-center">
+        <img
+          ref={imgRef}
+          src={src}
+          alt="Receipt"
+          className="max-w-full max-h-full object-contain"
+          style={{
+            transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
+            touchAction: "none",
+          }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function SplitView() {
@@ -65,6 +175,7 @@ export default function SplitView() {
   const [loading, setLoading] = useState(true);
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
   const [showAllOrders, setShowAllOrders] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
   const [error, setError] = useState("");
 
   const [editing, setEditing] = useState(false);
@@ -74,8 +185,8 @@ export default function SplitView() {
   const [editTax, setEditTax] = useState("");
   const [editTip, setEditTip] = useState("");
   const [editVenmo, setEditVenmo] = useState("");
-  const [newPerson, setNewPerson] = useState("");
   const [activePerson, setActivePerson] = useState<string | null>(null);
+  const [deepEdit, setDeepEdit] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const editTaxVal = num(editTax);
@@ -85,8 +196,7 @@ export default function SplitView() {
     try {
       const res = await fetch(`/api/splits/${id}`);
       if (!res.ok) throw new Error("Not found");
-      const data = await res.json();
-      setSplit(data);
+      setSplit(await res.json());
     } catch {
       setError("Split not found");
     } finally {
@@ -101,12 +211,15 @@ export default function SplitView() {
   const startEditing = () => {
     if (!split) return;
     setEditTitle(split.title);
-    setEditItems(split.items.map((i) => ({ ...i, assignedTo: [...i.assignedTo] })));
+    setEditItems(
+      split.items.map((i) => ({ ...i, assignedTo: [...i.assignedTo] })),
+    );
     setEditPeople([...split.people]);
     setEditTax(split.taxPercent ? String(split.taxPercent) : "");
     setEditTip(split.tipPercent ? String(split.tipPercent) : "");
     setEditVenmo(split.venmo || "");
     setActivePerson(null);
+    setDeepEdit(false);
     setEditing(true);
   };
 
@@ -147,51 +260,62 @@ export default function SplitView() {
           ? item.assignedTo.filter((p) => p !== activePerson)
           : [...item.assignedTo, activePerson];
         return { ...item, assignedTo: assigned };
-      })
+      }),
     );
   };
 
   const updateItem = (
     itemId: string,
     field: "name" | "price",
-    value: string | number
+    value: string | number,
   ) => {
     setEditItems(
       editItems.map((item) =>
-        item.id === itemId ? { ...item, [field]: value } : item
-      )
+        item.id === itemId ? { ...item, [field]: value } : item,
+      ),
     );
   };
-
   const removeItem = (itemId: string) => {
     setEditItems(editItems.filter((i) => i.id !== itemId));
   };
-
   const addItem = () => {
     setEditItems([
       ...editItems,
       { id: generateId(), name: "New Item", price: 0, assignedTo: [] },
     ]);
   };
-
   const addPerson = () => {
-    const name = newPerson.trim();
-    if (name && !editPeople.includes(name)) {
-      setEditPeople([...editPeople, name]);
-      setNewPerson("");
-      setActivePerson(name);
+    let n = editPeople.length + 1;
+    let name = `Friend ${n}`;
+    while (editPeople.includes(name)) {
+      n++;
+      name = `Friend ${n}`;
     }
+    setEditPeople([...editPeople, name]);
   };
-
   const removePerson = (name: string) => {
     setEditPeople(editPeople.filter((p) => p !== name));
     setEditItems(
       editItems.map((item) => ({
         ...item,
         assignedTo: item.assignedTo.filter((p) => p !== name),
-      }))
+      })),
     );
     if (activePerson === name) setActivePerson(null);
+  };
+  const renamePerson = (oldName: string, newName: string) => {
+    setEditPeople(editPeople.map((p) => (p === oldName ? newName : p)));
+    setEditItems(
+      editItems.map((item) => ({
+        ...item,
+        assignedTo: item.assignedTo.map((p) => (p === oldName ? newName : p)),
+      })),
+    );
+    if (activePerson === oldName) setActivePerson(newName);
+  };
+  const cancelEdits = () => {
+    setEditing(false);
+    setDeepEdit(false);
   };
 
   if (loading) {
@@ -209,8 +333,12 @@ export default function SplitView() {
       <Shell>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
-            <p className="text-xl font-bold mb-2">{error || "Split not found"}</p>
-            <a href="/" className="text-base text-zinc-600 underline">Create a new split</a>
+            <p className="text-xl font-bold mb-2">
+              {error || "Split not found"}
+            </p>
+            <a href="/" className="text-base text-zinc-600 underline">
+              Create a new split
+            </a>
           </div>
         </div>
       </Shell>
@@ -224,202 +352,84 @@ export default function SplitView() {
       <Shell>
         <div className="flex-1 p-4">
           <div className="max-w-lg mx-auto">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-xs text-zinc-400 uppercase tracking-widest">Edit Split</p>
-              <button onClick={() => setEditing(false)} className="text-base text-zinc-500 underline">
-                Cancel
-              </button>
-            </div>
-
-            <div className="text-center mb-4">
-              <input
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full bg-transparent text-center text-xl font-bold outline-none py-1"
-              />
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-center gap-2">
-                <span className="text-base text-zinc-500">Venmo @</span>
-                <input
-                  value={editVenmo}
-                  onChange={(e) => setEditVenmo(e.target.value)}
-                  placeholder="username"
-                  className="flex-1 bg-transparent text-base outline-none py-1"
-                />
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-xs text-zinc-400 uppercase tracking-widest mb-2">
-                People {activePerson && <span className="text-zinc-800 normal-case">— assigning for [{activePerson}]</span>}
-              </p>
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                {editPeople.map((person) => (
-                  <div key={person} className="flex items-center gap-1">
-                    <button
-                      onClick={() =>
-                        setActivePerson(activePerson === person ? null : person)
-                      }
-                      className={`px-2 py-0.5 text-base leading-none transition-all ${
-                        activePerson === person
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-700 hover:text-zinc-900"
-                      }`}
-                    >
-                      {person}
-                    </button>
-                    {activePerson === person && (
-                      <button
-                        onClick={() => removePerson(person)}
-                        className="text-zinc-400 hover:text-red-500 transition-colors"
-                      >
-                        <TrashIcon className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  value={newPerson}
-                  onChange={(e) => setNewPerson(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addPerson()}
-                  placeholder="Add a person..."
-                  className="flex-1 bg-transparent text-base outline-none py-1"
-                />
-                <button onClick={addPerson} className="text-base text-zinc-600 hover:text-zinc-800 underline">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            <div className="mb-2">
-              <div className="flex justify-between items-center mb-2">
-                <p className="text-xs text-zinc-400 uppercase tracking-widest">Items</p>
-                <button onClick={addItem} className="text-xs text-zinc-500 hover:text-zinc-700 underline">
-                  + Add
-                </button>
-              </div>
-              {editItems.map((item) => {
-                const isAssigned =
-                  activePerson !== null &&
-                  item.assignedTo.includes(activePerson);
-                return (
-                  <div
-                    key={item.id}
-                    className={`flex items-center gap-1 py-0.5 transition-colors cursor-pointer ${
-                      activePerson
-                        ? isAssigned
-                          ? "text-zinc-900"
-                          : "text-zinc-400"
-                        : ""
-                    }`}
-                    onClick={() => activePerson && toggleItemForActivePerson(item.id)}
-                  >
-                    {activePerson && (
-                      <span className="w-4 text-center flex-shrink-0">
-                        {isAssigned ? "×" : " "}
-                      </span>
-                    )}
-                    <span className="flex-shrink-0 w-4 text-right text-base">1</span>
-                    {activePerson ? (
-                      <>
-                        <span className="flex-1 text-base min-w-0">{item.name}</span>
-                        <span className="flex-shrink-0 text-base">{fmt(item.price)}</span>
-                      </>
-                    ) : (
-                      <>
-                        <input
-                          value={item.name}
-                          onChange={(e) => updateItem(item.id, "name", e.target.value)}
-                          className="flex-1 bg-transparent text-base outline-none min-w-0"
-                        />
-                        <input
-                          inputMode="decimal"
-                          value={"$" + item.price}
-                          onChange={(e) => {
-                            const raw = e.target.value.replace(/^\$/, "");
-                            updateItem(item.id, "price", raw === "" ? 0 : parseFloat(raw) || 0);
-                          }}
-                          className="w-20 bg-transparent text-right text-base outline-none flex-shrink-0"
-                        />
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-zinc-300 hover:text-red-500 ml-1 flex-shrink-0"
-                        >
-                          ×
-                        </button>
-                      </>
-                    )}
-                    {item.assignedTo.length > 0 && !activePerson && (
-                      <span className="text-xs text-zinc-400 ml-1 flex-shrink-0">
-                        ({item.assignedTo.join(", ")})
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="my-4">
-              <div className="mt-2 pt-2space-y-0.5">
-                <div className="flex justify-between text-base">
-                  <span>Subtotal</span>
-                  <span>{fmt(editSubtotal)}</span>
-                </div>
-                <div className="flex justify-between text-base items-center">
-                  <span className="flex items-center gap-1">
-                    Tax
-                    <input
-                      inputMode="decimal"
-                      value={editTax}
-                      onChange={(e) => setEditTax(e.target.value)}
-                      placeholder="0"
-                      className="w-10 bg-transparent text-right text-base outline-none"
-                    />%
-                  </span>
-                  <span>{fmt(editSubtotal * (editTaxVal / 100))}</span>
-                </div>
-                <div className="flex justify-between text-base items-center">
-                  <span className="flex items-center gap-1">
-                    Tip
-                    <input
-                      inputMode="decimal"
-                      value={editTip}
-                      onChange={(e) => setEditTip(e.target.value)}
-                      placeholder="0"
-                      className="w-10 bg-transparent text-right text-base outline-none"
-                    />%
-                  </span>
-                  <span>{fmt(editSubtotal * (editTipVal / 100))}</span>
-                </div>
-                <div className="mt-1 pt-1flex justify-between text-base font-bold">
-                  <span>TOTAL</span>
-                  <span>{fmt(editSubtotal * (1 + editTaxVal / 100 + editTipVal / 100))}</span>
-                </div>
-              </div>
-            </div>
-
+            <PageHeader
+              title={editTitle}
+              description={editVenmo ? `@${editVenmo}` : undefined}
+              onBack={() => {
+                if (deepEdit) {
+                  setDeepEdit(false);
+                } else {
+                  setEditing(false);
+                }
+              }}
+              onTitleChange={deepEdit ? setEditTitle : undefined}
+              actionLabel={deepEdit ? "Done" : "Edit"}
+              onAction={() => {
+                if (deepEdit) {
+                  setDeepEdit(false);
+                  setActivePerson(null);
+                } else {
+                  setDeepEdit(true);
+                  setActivePerson(null);
+                }
+              }}
+              venmo={deepEdit ? editVenmo : undefined}
+              onVenmoChange={deepEdit ? setEditVenmo : undefined}
+            />
+            <PeopleList
+              people={editPeople}
+              activePerson={activePerson}
+              setActivePerson={setActivePerson}
+              removePerson={removePerson}
+              addPerson={addPerson}
+              deepEdit={deepEdit}
+              onRenamePerson={renamePerson}
+            />
+            <ItemsList
+              items={editItems}
+              people={editPeople}
+              activePerson={activePerson}
+              setActivePerson={setActivePerson}
+              toggleItemForActivePerson={toggleItemForActivePerson}
+              updateItem={updateItem}
+              removeItem={removeItem}
+              addItem={addItem}
+              deepEdit={deepEdit}
+            />
+            <TotalsSection
+              subtotal={editSubtotal}
+              taxPercent={editTax}
+              setTaxPercent={setEditTax}
+              tipPercent={editTip}
+              setTipPercent={setEditTip}
+              taxVal={editTaxVal}
+              tipVal={editTipVal}
+              editable={deepEdit}
+            />
             {error && (
               <p className="text-red-600 text-base mb-4 text-center">{error}</p>
             )}
-
-            <button
+            <ActionButton
               onClick={saveEdits}
               disabled={saving}
-              className="w-full py-3 bg-zinc-800 text-white font-bold text-base uppercase tracking-widest hover:bg-zinc-700 disabled:opacity-50 mt-4"
+              className="mt-4"
             >
               {saving ? "Saving..." : "Save Changes"}
-            </button>
+            </ActionButton>
+            <ActionButton
+              onClick={cancelEdits}
+              variant="secondary"
+              className="mt-2"
+            >
+              Cancel Changes
+            </ActionButton>
           </div>
         </div>
       </Shell>
     );
   }
 
-  // See all orders
+  // All orders
   if (showAllOrders) {
     const allTotals = split.people.map((person) => ({
       person,
@@ -427,18 +437,14 @@ export default function SplitView() {
     }));
     const grandTotal =
       split.subtotal * (1 + split.taxPercent / 100 + split.tipPercent / 100);
-
     return (
       <Shell>
         <div className="flex-1 p-4">
           <div className="max-w-lg mx-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-xl font-bold">{split.title}</h1>
-              <button onClick={() => setShowAllOrders(false)} className="text-base text-zinc-500 underline">
-                Back
-              </button>
-            </div>
-
+            <PageHeader
+              title={split.title}
+              onBack={() => setShowAllOrders(false)}
+            />
             {allTotals.map(({ person, items, itemsTotal, tax, tip, total }) => (
               <div key={person} className="mb-4">
                 <p className="text-base font-bold uppercase pb-0.5 mb-1">
@@ -448,7 +454,9 @@ export default function SplitView() {
                   <div key={i} className="flex justify-between text-base">
                     <span>
                       1 {item.name}
-                      {item.split !== item.price && <span className="text-zinc-400"> (split)</span>}
+                      {item.split !== item.price && (
+                        <span className="text-zinc-400"> (1/{item.splitCount})</span>
+                      )}
                     </span>
                     <span>{fmt(item.split)}</span>
                   </div>
@@ -477,18 +485,13 @@ export default function SplitView() {
                 </div>
               </div>
             ))}
-
-            <div className="mt-3 pt-1 flex justify-between text-base font-bold">
+            <div className="mt-3 pt-1 w-full flex justify-between text-base font-bold">
               <span>GRAND TOTAL</span>
               <span>{fmt(grandTotal)}</span>
             </div>
-
-            <button
-              onClick={startEditing}
-              className="w-full py-3 bg-zinc-800 text-white font-bold text-base uppercase tracking-widest hover:bg-zinc-700 mt-6"
-            >
-              Edit Split
-            </button>
+            <ActionButton onClick={startEditing} className="mt-6">
+              Adjust Split
+            </ActionButton>
           </div>
         </div>
       </Shell>
@@ -499,17 +502,17 @@ export default function SplitView() {
   if (!selectedPerson) {
     return (
       <Shell>
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm text-center">
-            <h1 className="text-2xl font-bold mb-8">{split.title}</h1>
-            <p className="text-xs text-zinc-400 uppercase tracking-widest mb-4">Who are you?</p>
+        <div className="flex-1 p-4">
+          <div className="w-full max-w-sm mx-auto">
+            <PageHeader title={split.title} description="Who are you?" />
             <div className="space-y-2">
-              {split.people.map((person) => (
+              {split.people.map((person, i) => (
                 <button
                   key={person}
                   onClick={() => setSelectedPerson(person)}
-                  className="block w-full py-2 text-base text-center hover:text-zinc-600 transition-colors"
+                  className="flex items-center gap-2 w-full py-2 text-base text-left hover:text-zinc-600 transition-colors"
                 >
+                  <Avatar name={person} index={i} />
                   {person}
                 </button>
               ))}
@@ -522,20 +525,20 @@ export default function SplitView() {
 
   // Person's receipt
   const breakdown = calcBreakdown(split, selectedPerson);
-
   return (
     <Shell>
       <div className="flex-1 p-4">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-4">
-            <h1 className="text-xl font-bold">{split.title}</h1>
-            <p className="text-xs text-zinc-400 uppercase tracking-widest mt-1 mb-4">
-              {selectedPerson}&apos;s receipt
-            </p>
-          </div>
-
+          <PageHeader
+            title={split.title}
+            description={`${selectedPerson}'s receipt`}
+            actionLabel={split.receiptUrl ? "View Image" : undefined}
+            onAction={split.receiptUrl ? () => setShowReceipt(true) : undefined}
+          />
           {breakdown.items.length === 0 ? (
-            <p className="text-center text-zinc-500 py-8">No items assigned to you.</p>
+            <p className="text-center text-zinc-500 py-8">
+              No items assigned to you.
+            </p>
           ) : (
             <>
               <div className="mb-2">
@@ -543,14 +546,15 @@ export default function SplitView() {
                   <div key={i} className="flex justify-between text-base">
                     <span>
                       1 {item.name}
-                      {item.split !== item.price && <span className="text-zinc-400"> (split)</span>}
+                      {item.split !== item.price && (
+                        <span className="text-zinc-400"> (1/{item.splitCount})</span>
+                      )}
                     </span>
                     <span>{fmt(item.split)}</span>
                   </div>
                 ))}
               </div>
-
-              <div className="mt-2 pt-2space-y-0.5">
+              <div className="mt-2 pt-2 space-y-0.5">
                 <div className="flex justify-between text-base">
                   <span>Subtotal</span>
                   <span>{fmt(breakdown.itemsTotal)}</span>
@@ -567,39 +571,45 @@ export default function SplitView() {
                     <span>{fmt(breakdown.tip)}</span>
                   </div>
                 )}
-                <div className="mt-1 pt-1flex justify-between text-lg font-bold">
+                <div className="mt-1 pt-1 w-full flex justify-between text-lg font-bold">
                   <span>YOU OWE</span>
                   <span>{fmt(breakdown.total)}</span>
                 </div>
               </div>
             </>
           )}
-
           {split.venmo && breakdown.total > 0 && (
-            <a
-              href={venmoPayUrl(split.venmo, breakdown.total, `${split.title} — Jig split`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full mt-6 py-3 bg-[#008CFF] text-white font-bold text-base text-center uppercase tracking-widest hover:bg-[#0074D4] transition-colors"
+            <ActionButton
+              href={venmoPayUrl(
+                split.venmo,
+                breakdown.total,
+                `${split.title} - Jig split`,
+              )}
+              variant="venmo"
+              className="mt-6"
             >
-              Pay @{split.venmo} on Venmo
-            </a>
+              Venmo @{split.venmo}
+            </ActionButton>
           )}
-
-          <div className="flex flex-col items-center gap-2 mt-6 text-base">
-            <button
-              onClick={() => setSelectedPerson(null)}
-              className="text-zinc-500 hover:text-zinc-700 underline"
-            >
+          <PageFooter>
+            <FooterLink onClick={() => setSelectedPerson(null)}>
               Not {selectedPerson}? Switch
-            </button>
-            <button
-              onClick={() => setShowAllOrders(true)}
-              className="text-zinc-600 hover:text-zinc-800 underline"
+            </FooterLink>
+            <FooterLink
+              onClick={() => {
+                startEditing();
+                setActivePerson(selectedPerson);
+              }}
             >
-              See all orders
-            </button>
-          </div>
+              Adjust split
+            </FooterLink>
+          </PageFooter>
+          {showReceipt && split.receiptUrl && (
+            <ReceiptViewer
+              src={split.receiptUrl}
+              onClose={() => setShowReceipt(false)}
+            />
+          )}
         </div>
       </div>
     </Shell>

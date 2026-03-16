@@ -15,10 +15,11 @@ export async function POST(req: NextRequest) {
     tipPercent: body.tipPercent || 0,
     subtotal: body.subtotal || 0,
     venmo: body.venmo || "",
+    receiptUrl: body.receiptUrl || "",
     createdAt: new Date().toISOString(),
   };
 
-  saveSplit(split);
+  await saveSplit(split);
 
   return NextResponse.json({ id: split.id });
 }

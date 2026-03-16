@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const split = getSplit(id);
+  const split = await getSplit(id);
 
   if (!split) {
     return NextResponse.json({ error: "Split not found" }, { status: 404 });
@@ -20,7 +20,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const split = getSplit(id);
+  const split = await getSplit(id);
 
   if (!split) {
     return NextResponse.json({ error: "Split not found" }, { status: 404 });
@@ -37,9 +37,10 @@ export async function PUT(
     tipPercent: body.tipPercent ?? split.tipPercent,
     subtotal: body.subtotal ?? split.subtotal,
     venmo: body.venmo ?? split.venmo,
+    receiptUrl: body.receiptUrl ?? split.receiptUrl,
   };
 
-  saveSplit(updated);
+  await saveSplit(updated);
 
   return NextResponse.json({ ok: true });
 }

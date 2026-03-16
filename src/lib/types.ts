@@ -14,6 +14,7 @@ export interface Split {
   tipPercent: number;
   subtotal: number;
   venmo: string;
+  receiptUrl: string;
   createdAt: string;
 }
 

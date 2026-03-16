@@ -4,19 +4,19 @@ import { PaperTexture } from "@paper-design/shaders-react";
 
 export function BodyBg() {
   return (
-    <div className="fixed inset-0 -z-50 pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <PaperTexture
         colorBack="#faf9f6"
         colorFront="#e0dbd4"
-        contrast={0.3}
-        roughness={0.4}
+        contrast={0.6}
+        roughness={0.3}
         fiber={0.3}
         fiberSize={0.2}
         crumples={0.3}
         crumpleSize={0.35}
-        folds={0.65}
-        foldCount={5}
-        drops={0.2}
+        folds={0.8}
+        foldCount={8}
+        drops={0}
         fade={0}
         seed={5.8}
         scale={0.6}

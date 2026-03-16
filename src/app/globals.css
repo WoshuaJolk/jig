@@ -6,6 +6,12 @@
   --font-receipt: var(--font-receipt), monospace;
 }
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
@@ -15,4 +21,9 @@ body {
 input,
 button {
   font-family: inherit;
+}
+
+input {
+  overflow: visible;
+  line-height: 1.5;
 }

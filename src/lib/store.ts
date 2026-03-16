@@ -1,22 +1,22 @@
+import { Redis } from "@upstash/redis";
 import { Split } from "./types";
 
-// In-memory store. Works in development (server stays alive) and for demo purposes.
-// For production on Vercel, swap this with Vercel KV, Upstash Redis, or a database.
-const globalStore = globalThis as unknown as { __splits?: Map<string, Split> };
-if (!globalStore.__splits) {
-  globalStore.__splits = new Map<string, Split>();
+const redis = new Redis({
+  url: process.env.JIG_KV_REST_API_URL!,
+  token: process.env.JIG_KV_REST_API_TOKEN!,
+});
+
+const PREFIX = "split:";
+const TTL = 60 * 60 * 24 * 30; // 30 days
+
+export async function getSplit(id: string): Promise<Split | null> {
+  return redis.get<Split>(PREFIX + id);
 }
 
-const splits = globalStore.__splits;
-
-export function getSplit(id: string): Split | undefined {
-  return splits.get(id);
+export async function saveSplit(split: Split): Promise<void> {
+  await redis.set(PREFIX + split.id, split, { ex: TTL });
 }
 
-export function saveSplit(split: Split): void {
-  splits.set(split.id, split);
-}
-
-export function deleteSplit(id: string): void {
-  splits.delete(id);
+export async function deleteSplit(id: string): Promise<void> {
+  await redis.del(PREFIX + id);
 }
