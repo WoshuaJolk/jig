@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Suspense } from "react";
 import "./globals.css";
+import PostHogPageview from "./PostHogPageview";
 
 const receipt = localFont({
   src: "../fonts/Receipt.otf",
@@ -20,6 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${receipt.variable} font-receipt antialiased`}>
+        <Suspense fallback={null}>
+          <PostHogPageview />
+        </Suspense>
         {children}
       </body>
     </html>

@@ -12,6 +12,7 @@ import { ReceiptItem } from "@/lib/types";
 import { fmt, generateId, num } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import posthog from "posthog-js";
 
 interface SplitData {
   id: string;
@@ -196,7 +197,13 @@ export default function SplitView() {
     try {
       const res = await fetch(`/api/splits/${id}`);
       if (!res.ok) throw new Error("Not found");
-      setSplit(await res.json());
+      const data = await res.json();
+      setSplit(data);
+      posthog.capture("split_viewed", {
+        people_count: data.people.length,
+        item_count: data.items.length,
+        has_venmo: !!data.venmo,
+      });
     } catch {
       setError("Split not found");
     } finally {
@@ -242,6 +249,10 @@ export default function SplitView() {
         }),
       });
       if (!res.ok) throw new Error("Save failed");
+      posthog.capture("split_edited", {
+        people_count: editPeople.length,
+        item_count: editItems.length,
+      });
       setEditing(false);
       await fetchSplit();
     } catch {
@@ -579,17 +590,19 @@ export default function SplitView() {
             </>
           )}
           {split.venmo && breakdown.total > 0 && (
-            <ActionButton
+            <a
               href={venmoPayUrl(
                 split.venmo,
                 breakdown.total,
                 `${split.title} - Jig split`,
               )}
-              variant="venmo"
-              className="mt-6"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => posthog.capture("venmo_clicked", { amount: breakdown.total })}
+              className="block pt-4 pb-3 w-full font-bold text-base text-center uppercase tracking-widest transition-colors bg-[#008CFF] text-white hover:bg-[#0074D4] mt-6"
             >
               Venmo @{split.venmo}
-            </ActionButton>
+            </a>
           )}
           <PageFooter>
             <FooterLink onClick={() => setSelectedPerson(null)}>

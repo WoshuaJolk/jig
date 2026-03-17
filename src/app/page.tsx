@@ -11,6 +11,8 @@ import { ActionButton } from "@/components/ActionButton";
 import { generateId, num } from "@/lib/utils";
 import { ReceiptItem } from "@/lib/types";
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 type Phase = "upload" | "parsing" | "uploaded" | "editing" | "saving";
 
@@ -25,9 +27,11 @@ export default function SplitPage() {
   const [receiptUrl, setReceiptUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const [splitId, setSplitId] = useState<string | null>(null);
   const [activePerson, setActivePerson] = useState<string | null>(null);
   const [deepEdit, setDeepEdit] = useState(false);
   const [newPerson, setNewPerson] = useState("");
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const personInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,6 +102,11 @@ export default function SplitPage() {
       }
 
       if (data.receiptUrl) setReceiptUrl(data.receiptUrl);
+      posthog.capture("receipt_uploaded", {
+        item_count: parsedItems.length,
+        has_tax: data.tax != null,
+        has_tip: data.tip != null,
+      });
       setPhase("uploaded");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -156,7 +165,7 @@ export default function SplitPage() {
     setItems([...items, { id: generateId(), name: "New Item", price: 0, assignedTo: [] }]);
   };
 
-  const handleSave = async () => {
+  const handleSplit = async () => {
     if (people.length === 0) { setError("Add at least one person"); return; }
     setPhase("saving");
     setError("");
@@ -168,19 +177,42 @@ export default function SplitPage() {
       });
       if (!res.ok) throw new Error("Save failed");
       const data = await res.json();
-      const url = `${window.location.origin}/${data.id}`;
+      posthog.capture("split_created", {
+        people_count: people.length,
+        item_count: items.length,
+        has_venmo: !!venmo,
+        subtotal,
+        total: subtotal * (1 + taxVal / 100 + tipVal / 100),
+      });
+      setSplitId(data.id);
+      window.history.replaceState(null, "", `/${data.id}`);
+      setPhase("editing");
+    } catch {
+      setError("Failed to save");
+      setPhase("editing");
+    }
+  };
+
+  const handleSaveAndCopy = async () => {
+    if (!splitId) return;
+    setPhase("saving");
+    try {
+      const res = await fetch(`/api/splits/${splitId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, items, people, taxPercent: taxVal, tipPercent: tipVal, subtotal, venmo }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      const url = window.location.href;
       try {
         await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
       } catch {
-        // Clipboard API not available (mobile), fall back to share or just show link
         if (navigator.share) {
           navigator.share({ url }).catch(() => {});
         }
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
       }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
       setPhase("editing");
     } catch {
       setError("Failed to save");
@@ -255,8 +287,8 @@ export default function SplitPage() {
 
             {/* Split button */}
             <button
-              onClick={() => setPhase("editing")}
-              disabled={phase !== "uploaded"}
+              onClick={() => { posthog.capture("split_started", { people_count: people.length, item_count: items.length }); handleSplit(); }}
+              disabled={phase !== "uploaded" || people.length === 0}
               className="w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
             >
               Split
@@ -294,8 +326,8 @@ export default function SplitPage() {
             editable={deepEdit} />
           <PerPersonSummary personTotals={personTotals} />
           {error && <p className="text-red-600 text-base mb-4 text-center">{error}</p>}
-          <ActionButton onClick={handleSave} disabled={phase === "saving" || copied} className="mt-4">
-            {phase === "saving" ? "Saving..." : copied ? "Link Copied" : "Create Share Link"}
+          <ActionButton onClick={handleSaveAndCopy} disabled={phase === "saving" || copied} className="mt-4">
+            {phase === "saving" ? "Saving..." : copied ? "Link Copied" : "Save and Copy Link"}
           </ActionButton>
         </div>
       </div>
