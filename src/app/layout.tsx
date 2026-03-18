@@ -10,16 +10,20 @@ import { SITE_URL } from "@/lib/seo-config";
 const receipt = localFont({
   src: "../fonts/Receipt.otf",
   variable: "--font-receipt",
+  display: "swap",
+  adjustFontFallback: "Arial",
 });
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
+  display: "optional",
 });
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
+  display: "optional",
 });
 
 const title = "Jig — Split Any Receipt";
