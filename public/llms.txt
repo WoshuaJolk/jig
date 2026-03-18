@@ -1,0 +1,35 @@
+# Jig — Split Any Receipt
+
+> Jig is a free web-based receipt splitting tool. Upload a photo of any receipt, and Jig uses AI to parse items and prices. Assign items to people in your group, and Jig calculates each person's share including proportional tax and tip. Share a link so everyone can see what they owe. Supports Venmo for easy payments.
+
+## Key Features
+- AI-powered receipt parsing (upload a photo, get structured items)
+- Assign items to multiple people
+- Automatic tax and tip distribution
+- Shareable split links
+- Venmo payment integration
+- Works on any device (mobile-friendly)
+- No account required
+- Free to use
+
+## How It Works
+1. Upload a photo of your receipt
+2. Jig's AI extracts items, prices, tax, and tip
+3. Add the people splitting the bill
+4. Assign each item to the people who ordered it
+5. Share the link — everyone sees their total
+
+## Use Cases
+- Restaurant bills with friends
+- Roommate grocery runs
+- Group travel expenses
+- Office lunch orders
+- Party supply purchases
+
+## Links
+- Website: https://jig.so
+- Split a Receipt: https://jig.so
+- About: https://jig.so/about
+- FAQ: https://jig.so/faq
+- Blog: https://jig.so/blog
+- How It Works: https://jig.so/how-it-works

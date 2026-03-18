@@ -1,0 +1,11 @@
+/* TEAM */
+Product: Jig — Split Any Receipt
+Site: https://jig.so
+
+/* TECHNOLOGY */
+Framework: Next.js
+UI Library: React
+Language: TypeScript
+Styling: Tailwind CSS
+Hosting: Vercel
+AI: AI-powered receipt parsing

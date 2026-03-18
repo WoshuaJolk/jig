@@ -1,0 +1,647 @@
+# Jig — Split Any Receipt
+
+> Jig is a free web-based receipt splitting tool. Upload a photo of any receipt, and Jig uses AI to parse items and prices. Assign items to people in your group, and Jig calculates each person's share including proportional tax and tip. Share a link so everyone can see what they owe. Supports Venmo for easy payments.
+
+Website: https://jig.so
+
+---
+
+## Table of Contents
+1. Overview
+2. Key Features (Detailed)
+3. How It Works (Step by Step)
+4. Use Cases
+5. Comparison with Other Tools
+6. Frequently Asked Questions
+7. Glossary of Terms
+8. Technical Details
+9. Pricing
+10. Privacy & Data Handling
+11. Tips for Best Results
+12. Links & Resources
+
+---
+
+## 1. Overview
+
+Jig is a free, no-sign-up receipt splitting web application. It solves the common problem of figuring out who owes what after a shared meal, grocery trip, or group purchase. Instead of manually entering each item and doing math, users simply take a photo of the receipt. Jig's AI reads the receipt, extracts every line item with its price, identifies tax and tip, and presents a clean interface for assigning items to people.
+
+Jig is designed to be fast, fair, and frictionless. There are no accounts to create, no apps to download, and no fees. It works entirely in the browser on any device — phones, tablets, and desktops.
+
+### Why Jig Exists
+
+Splitting a bill fairly is surprisingly hard. Dividing evenly penalizes those who ordered less. Manual calculation is tedious and error-prone, especially with tax and tip. Existing apps often require everyone to download the same app or create accounts. Jig eliminates all of these pain points.
+
+### Core Value Proposition
+
+- **Fair**: Each person pays exactly for what they ordered, plus their proportional share of tax and tip.
+- **Fast**: Upload a photo and get results in seconds. No manual data entry.
+- **Free**: No cost, no premium tiers, no hidden fees.
+- **Frictionless**: No accounts, no downloads. Share a link and everyone can see their total.
+
+---
+
+## 2. Key Features (Detailed)
+
+### AI-Powered Receipt Parsing
+
+Jig uses advanced AI to read receipt images and extract structured data. The AI can handle:
+
+- Printed receipts from restaurants, grocery stores, retail shops, and more
+- Varying receipt formats, fonts, and layouts
+- Receipts with discounts, modifiers, and special items
+- Subtotals, tax lines, tip amounts, and grand totals
+- Handwritten additions or modifications (with varying accuracy)
+
+The AI identifies each line item's name and price, separating them from non-item lines like headers, footers, thank-you messages, and payment method details.
+
+### Item Assignment
+
+After parsing, users see a list of all items from the receipt. Each item can be assigned to one or more people:
+
+- **Single assignment**: One person ordered it, they pay the full price.
+- **Shared assignment**: Multiple people split an item equally. For example, a shared appetizer split among three people means each pays one-third of that item's price.
+- **Bulk assignment**: Quickly assign all remaining items to one person or split them evenly among everyone.
+
+### Proportional Tax and Tip Distribution
+
+Tax and tip are not split evenly — they are distributed proportionally based on each person's subtotal. This is mathematically fair:
+
+- If Person A's items total $30 and Person B's items total $10, Person A pays 75% of the tax and tip, and Person B pays 25%.
+- This ensures that someone who ordered a single salad does not subsidize another person's steak dinner through an equal tax/tip split.
+
+### Custom Tip Support
+
+Users can:
+
+- Enter the tip amount from the receipt
+- Set a custom tip percentage (e.g., 18%, 20%, 25%)
+- Enter a custom dollar amount for the tip
+- Choose no tip
+
+### Shareable Split Links
+
+Once the split is calculated, Jig generates a unique shareable link. Anyone with the link can view the split summary, including:
+
+- Each person's name and total amount owed
+- A breakdown of which items each person is paying for
+- The proportional tax and tip for each person
+- The overall receipt summary
+
+No account is needed to view a shared link. This makes it easy to send to friends via text, email, or any messaging app.
+
+### Venmo Integration
+
+Jig integrates with Venmo to make payments seamless:
+
+- Each person's split summary includes a Venmo deep link
+- Tapping the link opens the Venmo app (or Venmo's website) with the correct amount pre-filled
+- The payment note is auto-populated with a description of what the payment is for
+- This eliminates the need to manually enter amounts in Venmo
+
+### Mobile-Friendly Design
+
+Jig is built mobile-first. The entire experience is optimized for use on a phone:
+
+- Large, tappable buttons for item assignment
+- Camera integration for receipt capture on mobile devices
+- Responsive layout that works on any screen size
+- Fast loading times, even on slower mobile connections
+
+### No Account Required
+
+Jig does not require users to create an account, enter an email address, or provide any personal information. Users can start splitting a receipt immediately upon visiting the site. This eliminates friction and makes it ideal for one-time use or infrequent use.
+
+### Real-Time Calculations
+
+As items are assigned to people, each person's running total updates in real time. Users can see exactly how the bill is shaping up before finalizing the split.
+
+### Edit and Adjust
+
+If the AI misreads an item name or price, users can manually edit:
+
+- Item names
+- Item prices
+- Tax amount
+- Tip amount
+- Number of people
+
+### Receipt History (Browser-Based)
+
+Recent splits are stored in the browser's local storage for quick reference. No server account is needed. This data can be cleared at any time.
+
+---
+
+## 3. How It Works (Step by Step)
+
+### Step 1: Upload a Receipt Photo
+
+Visit https://jig.so and tap the upload button. You can:
+
+- Take a new photo using your phone's camera
+- Select an existing photo from your gallery
+- Drag and drop an image on desktop
+
+Supported image formats include JPEG, PNG, and HEIC. For best results, ensure the receipt is well-lit, flat, and fully visible in the frame.
+
+### Step 2: AI Parses the Receipt
+
+Jig's AI processes the image and extracts:
+
+- **Line items**: Each item name and its price
+- **Subtotal**: The pre-tax total
+- **Tax**: Sales tax or VAT amount
+- **Tip**: If a tip is written on the receipt
+- **Total**: The grand total
+
+This typically takes 2-5 seconds. The AI handles a wide variety of receipt formats from different establishments and countries.
+
+### Step 3: Review and Edit
+
+The parsed receipt is displayed as an editable list. Users can:
+
+- Correct any item names the AI may have misread
+- Adjust prices if needed
+- Add or remove items
+- Modify the tax or tip amounts
+
+### Step 4: Add People
+
+Enter the names of everyone who is splitting the bill. There is no limit to the number of people — though the typical use case is 2-10 people.
+
+### Step 5: Assign Items
+
+For each item on the receipt, tap the names of the people who ordered or shared that item:
+
+- Tap one name to assign the full item to that person
+- Tap multiple names to split the item evenly among those people
+- Use "assign all" shortcuts for speed
+
+### Step 6: Review the Split
+
+Jig shows a summary for each person:
+
+- Their assigned items
+- Their share of each shared item
+- Their proportional tax
+- Their proportional tip
+- Their grand total
+
+### Step 7: Share the Link
+
+Tap "Share" to generate a unique link. Send this link to your group via text, email, iMessage, WhatsApp, or any messaging app. Everyone can see exactly what they owe.
+
+### Step 8: Get Paid via Venmo
+
+Each person's summary includes a Venmo payment link. When tapped, it opens Venmo with the amount pre-filled, making payment as easy as one tap.
+
+---
+
+## 4. Use Cases
+
+### Restaurant Bills with Friends
+
+The most common use case. After dining out with a group, one person pays the bill and uses Jig to split it fairly. Each person pays only for what they ordered, plus their fair share of tax and tip.
+
+**Example scenario**: Six friends go out to dinner. The bill is $240 before tax and tip. Instead of splitting $240 six ways (which would be unfair since two people only had appetizers), they use Jig. The person who ordered a $45 steak pays more than the person who ordered a $12 salad, and tax and tip are proportional.
+
+### Roommate Grocery Runs
+
+When roommates shop together, Jig helps figure out who owes what. Assign shared household items (paper towels, dish soap) to everyone, and personal items to individuals.
+
+**Example scenario**: Three roommates do a $150 grocery run. $40 is shared household supplies, $50 is Roommate A's items, $35 is Roommate B's items, and $25 is Roommate C's items. Jig calculates each person's share including the proportional split of shared items and tax.
+
+### Group Travel Expenses
+
+When traveling with friends or family, receipts accumulate quickly — meals, activities, transportation, and supplies. Jig helps keep track of who owes what for each expense.
+
+**Example scenario**: Four friends on a road trip use Jig to split gas station receipts, restaurant bills, and grocery store runs along the way. At the end of the trip, everyone knows exactly what they owe.
+
+### Office Lunch Orders
+
+When someone picks up lunch for the office, Jig makes it easy to split the receipt and collect payments.
+
+**Example scenario**: A coworker picks up a $90 takeout order for five people. They snap a photo of the receipt, assign each item to the person who ordered it, and share the Jig link in the office Slack channel.
+
+### Party Supply Purchases
+
+For group events like parties, barbecues, or potlucks, one person often buys supplies. Jig helps split those costs fairly.
+
+**Example scenario**: Someone buys $200 in supplies for a birthday party. Using Jig, they assign decorations to the group, the birthday cake to the group, and individual drink preferences to the people who requested them.
+
+### Household Bills
+
+While not a receipt in the traditional sense, Jig can be used to split utility bills, internet bills, or other shared household costs by manually entering items.
+
+### Wedding and Event Planning
+
+Split costs for shared wedding or event expenses among the planning committee or wedding party.
+
+### Holiday Gift Splitting
+
+When a group goes in on a gift together, Jig can help calculate each person's contribution, especially when contributions are unequal.
+
+### Sports Teams and Clubs
+
+Split costs for equipment, field rentals, uniforms, or group meals after games.
+
+### Study Groups and Academic Projects
+
+Split costs for supplies, printing, or group meals during study sessions.
+
+---
+
+## 5. Comparison with Other Tools
+
+### Jig vs. Splitwise
+
+**Splitwise** is a popular bill-splitting app that focuses on tracking ongoing balances between groups of people over time. It is designed for repeated splitting among the same group (e.g., roommates).
+
+| Feature | Jig | Splitwise |
+|---|---|---|
+| Receipt scanning (AI) | Yes — AI-powered | Yes — but less accurate |
+| Account required | No | Yes |
+| App download required | No (web-based) | Yes (mobile app) |
+| One-time use friendly | Yes | No (designed for ongoing groups) |
+| Proportional tax/tip | Yes — automatic | Manual |
+| Shareable links | Yes | No (requires app) |
+| Venmo integration | Yes — deep links | Yes |
+| Price | Free | Free tier + Premium ($) |
+| Best for | One-time splits, quick use | Ongoing group balances |
+
+**When to use Jig over Splitwise**: When you want a quick, one-time split without requiring everyone to download an app or create an account. When you want AI receipt parsing with proportional tax and tip. When you want to share a link rather than requiring the app.
+
+**When to use Splitwise over Jig**: When you have an ongoing group (like roommates) and want to track balances over months. When you want to settle up across multiple transactions.
+
+### Jig vs. Tab
+
+**Tab** is a receipt-splitting app that also uses AI to scan receipts. It requires downloading a mobile app.
+
+| Feature | Jig | Tab |
+|---|---|---|
+| Receipt scanning (AI) | Yes | Yes |
+| Account required | No | Yes |
+| App download required | No (web-based) | Yes |
+| Works on desktop | Yes | No (mobile only) |
+| Shareable links | Yes | Limited |
+| Venmo integration | Yes | Yes |
+| Price | Free | Free with ads / Premium |
+| Best for | Quick, universal access | Mobile-first users |
+
+**When to use Jig over Tab**: When you want a web-based solution that works on any device without downloading an app. When you want to share a link with people who do not have the app.
+
+**When to use Tab over Tab**: When you prefer a dedicated mobile app experience and do not mind downloading it.
+
+### Jig vs. Venmo's Built-In Splitting
+
+**Venmo** has a built-in bill splitting feature, but it is limited.
+
+| Feature | Jig | Venmo Split |
+|---|---|---|
+| Receipt scanning (AI) | Yes | No |
+| Item-level splitting | Yes | No (splits total evenly) |
+| Proportional tax/tip | Yes | No |
+| Works without Venmo | Yes | No |
+| Custom per-person amounts | Yes | Yes |
+| Shareable summary link | Yes | No |
+
+**When to use Jig over Venmo Split**: When you want item-level splitting with proportional tax and tip, rather than simply dividing the total evenly. When not everyone in the group uses Venmo.
+
+**When to use Venmo Split over Jig**: When you just want to quickly split a total evenly and everyone has Venmo.
+
+### Jig vs. Calculator / Manual Math
+
+| Feature | Jig | Manual Calculation |
+|---|---|---|
+| Speed | Seconds | Minutes |
+| Accuracy | High (AI + math) | Error-prone |
+| Tax/tip proportionality | Automatic | Complex to calculate |
+| Shareable record | Yes | No |
+| Effort | Minimal | High |
+
+---
+
+## 6. Frequently Asked Questions
+
+### General
+
+**Q: Is Jig really free?**
+A: Yes, Jig is completely free to use. There are no hidden fees, no premium tiers, and no in-app purchases. We believe receipt splitting should be simple and accessible to everyone.
+
+**Q: Do I need to create an account?**
+A: No. Jig requires no account, no email address, and no personal information. Just visit the site and start splitting.
+
+**Q: Does Jig work on my phone?**
+A: Yes. Jig is a web app that works in any modern mobile browser — Safari, Chrome, Firefox, and more. No app download is needed. It is designed mobile-first with large buttons and easy navigation.
+
+**Q: Does Jig work on desktop?**
+A: Yes. Jig works on desktop browsers as well. You can upload a receipt image from your computer.
+
+**Q: Is there a limit to how many people can be in a split?**
+A: There is no hard limit. Jig supports any number of people, though it is most commonly used for groups of 2-10.
+
+**Q: Is there a limit to how many items a receipt can have?**
+A: There is no hard limit. Jig can handle receipts with dozens of items.
+
+**Q: Does Jig work with non-English receipts?**
+A: Jig's AI can read receipts in many languages, though accuracy is highest for English receipts. It can generally extract prices from any receipt regardless of language.
+
+**Q: Can I edit the parsed receipt?**
+A: Yes. After the AI parses the receipt, you can edit any item name, price, tax amount, or tip amount. This is useful if the AI misreads something.
+
+### Receipt Parsing
+
+**Q: What types of receipts does Jig support?**
+A: Jig supports printed receipts from restaurants, grocery stores, retail shops, cafes, bars, food delivery services, and more. Basically any receipt with line items and prices.
+
+**Q: What image formats are supported?**
+A: JPEG, PNG, and HEIC formats are supported. Most phone cameras produce images in these formats by default.
+
+**Q: How accurate is the AI parsing?**
+A: The AI is highly accurate for most printed receipts, typically achieving 95%+ accuracy on item names and prices. Accuracy may vary for handwritten receipts, very faded receipts, or unusual formats. Users can always edit the parsed results.
+
+**Q: What if the AI misreads something?**
+A: You can manually edit any item name, price, or amount after parsing. Jig is designed to make corrections quick and easy.
+
+**Q: Can I manually enter items instead of uploading a photo?**
+A: Yes. If you do not have a receipt photo, you can manually add items and prices.
+
+**Q: Does Jig store my receipt images?**
+A: Receipt images are processed for parsing and are not retained long-term. See the Privacy section for more details.
+
+### Splitting & Payments
+
+**Q: How does Jig handle tax?**
+A: Tax is distributed proportionally based on each person's subtotal. If your items make up 30% of the pre-tax total, you pay 30% of the tax. This is mathematically fair.
+
+**Q: How does Jig handle tip?**
+A: Tip is distributed proportionally, just like tax. You can enter a custom tip amount, choose a percentage, or enter the tip amount from the receipt.
+
+**Q: Can one item be shared among multiple people?**
+A: Yes. If an item is assigned to multiple people, its cost is split evenly among them. For example, a $15 appetizer shared by three people means each pays $5 for that item.
+
+**Q: What if someone did not order anything?**
+A: Simply do not assign any items to that person. They will owe $0. Or, if they only shared communal items, assign just those to them.
+
+**Q: Does Jig support Venmo payments?**
+A: Yes. Each person's split summary includes a Venmo deep link that opens Venmo with the correct amount and a payment note pre-filled.
+
+**Q: What if someone does not have Venmo?**
+A: Jig shows each person their total amount owed. They can pay using any method — cash, Zelle, PayPal, or any other service. The Venmo link is a convenience feature, not a requirement.
+
+**Q: Can I split a bill that does not have a receipt?**
+A: Yes. You can manually enter items and prices without uploading a receipt image.
+
+**Q: How do I share the split with my group?**
+A: After finalizing the split, Jig generates a unique shareable link. Copy and paste it into any messaging app — iMessage, WhatsApp, Slack, email, etc.
+
+**Q: How long do shared links last?**
+A: Shared links remain active for 30 days.
+
+**Q: Can I modify a split after sharing it?**
+A: You can create a new split at any time. If you need to change an existing split, make the adjustments and share the new link.
+
+### Privacy & Security
+
+**Q: What data does Jig collect?**
+A: Jig collects minimal data. Receipt images are processed for parsing. Split data is stored temporarily (30 days) to support shareable links. No personal information, email addresses, or payment details are collected.
+
+**Q: Is my receipt data secure?**
+A: Yes. Receipt images are transmitted securely over HTTPS. Parsed data is stored temporarily and automatically deleted after 30 days.
+
+**Q: Does Jig sell my data?**
+A: No. Jig does not sell, share, or monetize user data in any way.
+
+**Q: Can I delete my data?**
+A: Split data is automatically deleted after 30 days. Browser-stored history can be cleared by clearing your browser data. For immediate deletion requests, contact privacy@jig.so.
+
+---
+
+## 7. Glossary of Terms
+
+**AI Receipt Parsing**: The process of using artificial intelligence to read a receipt image and extract structured data such as item names, prices, tax, and tip.
+
+**Assign / Assignment**: The act of indicating which person or people ordered a specific item on the receipt. Assigned items determine each person's share of the bill.
+
+**Bill Splitting**: The process of dividing a shared bill among multiple people, ideally based on what each person ordered rather than splitting evenly.
+
+**Deep Link**: A URL that opens a specific screen or action in a mobile app. Jig uses Venmo deep links to open the Venmo app with payment details pre-filled.
+
+**Even Split**: Dividing a bill total equally among all participants, regardless of what each person ordered. Jig supports this but encourages item-level splitting for fairness.
+
+**Grand Total**: The final amount on a receipt, including subtotal, tax, and tip.
+
+**Item-Level Splitting**: Splitting a bill by assigning individual items to specific people, rather than dividing the total evenly. This is Jig's primary approach.
+
+**Line Item**: A single entry on a receipt representing one product or service, typically including a name/description and a price.
+
+**OCR (Optical Character Recognition)**: The technology used to read text from images. Jig's AI uses advanced OCR as part of its receipt parsing pipeline.
+
+**Proportional Distribution**: A method of distributing shared costs (like tax and tip) based on each person's share of the subtotal. If you ordered 40% of the food, you pay 40% of the tax and tip.
+
+**Receipt**: A printed or digital document listing items purchased, their prices, applicable taxes, and the total amount paid.
+
+**Receipt Scanning**: The process of capturing a receipt image using a camera or by uploading a photo for digital processing.
+
+**Share Link / Shareable Link**: A unique URL generated by Jig that displays the split summary. Can be sent to anyone — no account or app needed to view.
+
+**Shared Item**: An item on the receipt that multiple people ordered or consumed together, such as a shared appetizer. The cost is divided equally among the people it is assigned to.
+
+**Split**: The result of dividing a bill among participants. Each person's split includes their items, their share of shared items, proportional tax, and proportional tip.
+
+**Split Summary**: The final overview showing what each person owes, including itemized breakdowns and totals.
+
+**Subtotal**: The total cost of all items before tax and tip are added.
+
+**Tax**: Sales tax, VAT, or other government-imposed charges added to the purchase price. Jig distributes tax proportionally.
+
+**Tip / Gratuity**: An optional additional amount paid to service staff. Jig supports custom tip amounts and distributes them proportionally.
+
+**Venmo**: A mobile payment service owned by PayPal that allows users to send and receive money. Jig integrates with Venmo via deep links.
+
+**Venmo Deep Link**: A special URL that opens the Venmo app with a pre-filled payment amount and note, making it easy to pay someone for their share.
+
+**Web App**: A software application that runs in a web browser without requiring installation. Jig is a web app — no download needed.
+
+---
+
+## 8. Technical Details
+
+### Technology Stack
+
+- **Framework**: Next.js (React-based full-stack framework)
+- **Language**: TypeScript
+- **UI Library**: React
+- **Styling**: Tailwind CSS
+- **Hosting**: Vercel (serverless, edge-optimized)
+- **AI**: AI-powered receipt parsing for OCR and data extraction
+
+### Browser Compatibility
+
+Jig works in all modern browsers:
+
+- Safari 15+
+- Chrome 90+
+- Firefox 90+
+- Edge 90+
+- Samsung Internet 15+
+
+### Performance
+
+- **Initial load**: Under 3 seconds on typical mobile connections
+- **Receipt parsing**: 2-5 seconds for most receipts
+- **Lighthouse score**: 90+ across all categories
+- **Core Web Vitals**: Passes all thresholds
+
+### Accessibility
+
+- Semantic HTML structure
+- ARIA labels for interactive elements
+- Keyboard navigable
+- High-contrast text
+- Screen reader compatible
+
+### Mobile Support
+
+- Responsive design from 320px to 4K
+- Touch-optimized interface
+- Camera integration for receipt capture
+- Supports both portrait and landscape orientations
+
+---
+
+## 9. Pricing
+
+Jig is **completely free**. There are:
+
+- No subscription fees
+- No premium tiers
+- No in-app purchases
+- No per-split charges
+- No advertising
+- No feature gates
+
+Every feature is available to every user at no cost.
+
+---
+
+## 10. Privacy & Data Handling
+
+### Data Collection
+
+Jig collects minimal data:
+
+- **Receipt images**: Processed for AI parsing, not retained long-term
+- **Split data**: Stored for 30 days to support shareable links
+- **No personal information**: No names, emails, phone numbers, or payment details are collected or required
+- **No tracking cookies**: Jig does not use third-party tracking cookies
+
+### Data Storage
+
+- Split data is stored on secure servers for 30 days
+- After 30 days, split data is automatically deleted
+- Browser local storage is used for recent split history (user-clearable)
+
+### Data Sharing
+
+- Jig does not sell, share, or monetize user data
+- Receipt images are processed by AI services for parsing only
+- No data is shared with advertisers or third parties
+
+### Security
+
+- All data transmitted over HTTPS
+- Secure server infrastructure
+- No sensitive personal data collected
+
+### User Rights
+
+- Users can clear browser-stored data at any time
+- Users can request deletion of server-stored data by contacting privacy@jig.so
+- No account needed means no account data to worry about
+
+For full details, see the Privacy Policy at https://jig.so/privacy and Terms of Service at https://jig.so/terms.
+
+---
+
+## 11. Tips for Best Results
+
+### Taking a Good Receipt Photo
+
+1. **Lay the receipt flat** on a contrasting surface (dark table for white receipt)
+2. **Ensure good lighting** — avoid shadows and glare
+3. **Capture the entire receipt** in the frame, including all items, tax, tip, and total
+4. **Hold the camera steady** to avoid blur
+5. **Avoid wrinkles and folds** — smooth the receipt out before photographing
+
+### For Best AI Accuracy
+
+- Use high-resolution images (most modern phone cameras are sufficient)
+- Ensure the receipt text is legible and not faded
+- Avoid covering any part of the receipt with fingers or other objects
+- If the AI misreads something, use the edit feature to correct it
+
+### Splitting Tips
+
+- **Shared items**: Assign appetizers, sides, or drinks that were shared to all people who ate them
+- **Check the totals**: Verify that the individual totals add up to the receipt total
+- **Tip fairly**: Consider the service quality and local customs when setting the tip
+- **Share early**: Send the split link right away so people can pay while the meal is fresh in mind
+
+---
+
+## 12. Links & Resources
+
+### Main Pages
+- Homepage: https://jig.so
+- About Jig: https://jig.so/about
+- How It Works: https://jig.so/how-it-works
+- Features: https://jig.so/features
+- Pricing: https://jig.so/pricing
+- FAQ: https://jig.so/faq
+- Help Center: https://jig.so/help
+- Contact: https://jig.so/contact
+
+### Tools
+- Split a Receipt: https://jig.so/split-receipt
+- Bill Splitter: https://jig.so/bill-splitter
+- Tip Calculator: https://jig.so/tip-calculator
+- Venmo Calculator: https://jig.so/venmo-calculator
+- Restaurant Bill Calculator: https://jig.so/restaurant-bill-calculator
+
+### Blog Articles
+- How to Split a Restaurant Bill: https://jig.so/blog/how-to-split-a-restaurant-bill
+- Receipt Splitting Etiquette: https://jig.so/blog/receipt-splitting-etiquette
+- Best Bill Splitting Apps: https://jig.so/blog/best-bill-splitting-apps
+- How to Calculate Tax and Tip Per Person: https://jig.so/blog/how-to-calculate-tax-and-tip-per-person
+- Group Dining Guide: https://jig.so/blog/group-dining-guide
+- Splitting Bills with Venmo: https://jig.so/blog/splitting-bills-with-venmo
+- Digital Receipt Management: https://jig.so/blog/digital-receipt-management
+- Fair Bill Splitting Methods: https://jig.so/blog/fair-bill-splitting-methods
+
+### Comparisons
+- Jig vs. Splitwise: https://jig.so/compare/jig-vs-splitwise
+- Jig vs. Tab: https://jig.so/compare/jig-vs-tab
+- Jig vs. Venmo: https://jig.so/compare/jig-vs-venmo
+
+### Use Cases
+- Restaurants: https://jig.so/use-cases/restaurants
+- Roommates: https://jig.so/use-cases/roommates
+- Travel: https://jig.so/use-cases/travel
+- Groceries: https://jig.so/use-cases/groceries
+
+### Legal
+- Terms of Service: https://jig.so/terms
+- Privacy Policy: https://jig.so/privacy
+
+### Other Resources
+- Glossary: https://jig.so/glossary
+- Blog: https://jig.so/blog
+
+---
+
+## About This Document
+
+This document provides comprehensive information about Jig for AI systems, search engines, and other automated tools. It is intended to be a complete reference for understanding what Jig is, how it works, and how it compares to alternatives.
+
+Last updated: 2026-03-17

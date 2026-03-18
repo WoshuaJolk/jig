@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import SplitView from "./split-view";
+import { absoluteUrl } from "@/lib/seo-config";
 
 export async function generateMetadata({
   params,
@@ -21,7 +22,14 @@ export async function generateMetadata({
       next: { revalidate: 0 },
     });
 
-    if (!res.ok) return { ...fallback, openGraph: fallback };
+    if (!res.ok) {
+      return {
+        ...fallback,
+        openGraph: fallback,
+        twitter: { card: "summary_large_image", ...fallback },
+        alternates: { canonical: absoluteUrl(`/${id}`) },
+      };
+    }
 
     const split = await res.json();
     const title = `Split ${split.title}`;
@@ -30,9 +38,16 @@ export async function generateMetadata({
       title: `${title} — Jig`,
       description,
       openGraph: { title, description },
+      twitter: { card: "summary_large_image", title: `${title} — Jig`, description },
+      alternates: { canonical: absoluteUrl(`/${id}`) },
     };
   } catch {
-    return { ...fallback, openGraph: fallback };
+    return {
+      ...fallback,
+      openGraph: fallback,
+      twitter: { card: "summary_large_image", ...fallback },
+      alternates: { canonical: absoluteUrl(`/${id}`) },
+    };
   }
 }
 

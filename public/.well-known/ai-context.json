@@ -1,0 +1,65 @@
+{
+  "name": "Jig",
+  "tagline": "Split Any Receipt",
+  "description": "Free AI-powered receipt splitting tool. Upload a photo of any receipt, and Jig uses AI to parse items and prices. Assign items to people in your group, and Jig calculates each person's share including proportional tax and tip. Share a link so everyone can see what they owe. Supports Venmo for easy payments.",
+  "url": "https://jig.so",
+  "category": "Finance / Utilities",
+  "pricing": "Free",
+  "features": [
+    "AI-powered receipt parsing from photos",
+    "Automatic item and price extraction",
+    "Assign items to multiple people",
+    "Proportional tax distribution per person",
+    "Proportional tip distribution per person",
+    "Custom tip amounts and percentages",
+    "Shareable split summary links",
+    "Venmo payment integration with deep links",
+    "Mobile-friendly responsive design",
+    "No account or sign-up required",
+    "Supports any receipt format",
+    "Real-time split calculations",
+    "Works offline after initial load",
+    "Privacy-focused — minimal data collection",
+    "Instant results — no waiting"
+  ],
+  "use_cases": [
+    "Splitting restaurant bills with friends",
+    "Dividing grocery costs among roommates",
+    "Sharing travel and hotel expenses",
+    "Splitting office lunch orders",
+    "Dividing party supply purchases",
+    "Managing group event costs",
+    "Splitting utility bills among housemates",
+    "Sharing subscription costs",
+    "Dividing wedding-related expenses",
+    "Splitting costs for group gifts"
+  ],
+  "supported_platforms": ["Web", "Mobile Web"],
+  "integrations": ["Venmo"],
+  "requirements": "No account needed. Works in any modern web browser.",
+  "data_handling": {
+    "storage": "Split data stored for 30 days",
+    "account_required": false,
+    "data_collection": "Minimal — no personal data required"
+  },
+  "links": {
+    "homepage": "https://jig.so",
+    "about": "https://jig.so/about",
+    "how_it_works": "https://jig.so/how-it-works",
+    "faq": "https://jig.so/faq",
+    "features": "https://jig.so/features",
+    "pricing": "https://jig.so/pricing",
+    "blog": "https://jig.so/blog",
+    "terms": "https://jig.so/terms",
+    "privacy": "https://jig.so/privacy",
+    "contact": "https://jig.so/contact",
+    "help": "https://jig.so/help"
+  },
+  "tools": {
+    "split_receipt": "https://jig.so/split-receipt",
+    "bill_splitter": "https://jig.so/bill-splitter",
+    "tip_calculator": "https://jig.so/tip-calculator",
+    "venmo_calculator": "https://jig.so/venmo-calculator",
+    "restaurant_bill_calculator": "https://jig.so/restaurant-bill-calculator"
+  }
+}

@@ -5,7 +5,7 @@ import { Statue } from "./statue";
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-dvh overflow-y-auto overscroll-none">
+    <div className="shell-scroll-container h-dvh overflow-y-auto overscroll-none">
       {/* Main content — opaque, covers the fixed footer while scrolling */}
       <div className="relative z-10 min-h-dvh bg-[#faf9f6] flex flex-col">
         <BodyBg />

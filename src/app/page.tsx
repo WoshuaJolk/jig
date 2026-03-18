@@ -234,7 +234,7 @@ export default function SplitPage() {
       <Shell>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm space-y-4">
-            <input ref={fileRef} type="file" accept="image/*" className="sr-only"
+            <input ref={fileRef} type="file" accept="image/*" className="sr-only" aria-label="Upload receipt image"
               onChange={(e) => { const file = e.target.files?.[0]; if (file) handleFile(file); }} />
             <button
               onClick={() => fileRef.current?.click()}
