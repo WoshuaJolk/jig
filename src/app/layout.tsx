@@ -1,17 +1,17 @@
+import { SITE_URL } from "@/lib/seo-config";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Suspense } from "react";
 import "./globals.css";
-import PostHogPageview from "./PostHogPageview";
 import { JsonLd } from "./json-ld";
-import { SITE_URL } from "@/lib/seo-config";
+import PostHogPageview from "./PostHogPageview";
 
 const receipt = localFont({
   src: "../fonts/Receipt.otf",
   variable: "--font-receipt",
   display: "swap",
-  adjustFontFallback: "Arial",
+  adjustFontFallback: false,
 });
 
 const geist = Geist({
@@ -24,6 +24,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
   display: "optional",
+  adjustFontFallback: false,
 });
 
 const title = "Jig — Split Any Receipt";
@@ -88,7 +89,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${receipt.variable} ${geist.variable} ${geistMono.variable} font-receipt antialiased`}>
+      <body
+        className={`${receipt.variable} ${geist.variable} ${geistMono.variable} font-receipt antialiased`}
+      >
         <JsonLd />
         <Suspense fallback={null}>
           <PostHogPageview />

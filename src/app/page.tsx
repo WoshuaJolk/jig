@@ -1,18 +1,18 @@
 "use client";
 
-import { Shell } from "@/components/shell";
+import { ActionButton } from "@/components/ActionButton";
 import { DotLoader } from "@/components/DotLoader";
+import { ItemsList } from "@/components/ItemsList";
 import { PageHeader } from "@/components/PageHeader";
 import { PeopleList } from "@/components/PeopleList";
-import { ItemsList } from "@/components/ItemsList";
-import { TotalsSection } from "@/components/TotalsSection";
 import { PerPersonSummary } from "@/components/PerPersonSummary";
-import { ActionButton } from "@/components/ActionButton";
-import { generateId, num } from "@/lib/utils";
+import { Shell } from "@/components/shell";
+import { TotalsSection } from "@/components/TotalsSection";
 import { ReceiptItem } from "@/lib/types";
-import { useCallback, useRef, useState } from "react";
+import { generateId, num } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
+import { useCallback, useRef, useState } from "react";
 
 type Phase = "upload" | "parsing" | "uploaded" | "editing" | "saving";
 
@@ -33,7 +33,7 @@ export default function SplitPage() {
   const [newPerson, setNewPerson] = useState("");
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const personInputRef = useRef<HTMLInputElement>(null);
+  const personInputRef = useRef<HTMLSpanElement>(null);
 
   const taxVal = num(taxPercent);
   const tipVal = num(tipPercent);
@@ -53,7 +53,11 @@ export default function SplitPage() {
         file.name.toLowerCase().endsWith(".heif");
       if (isHeic) {
         const heic2any = (await import("heic2any")).default;
-        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+        const blob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.9,
+        });
         imageFile = Array.isArray(blob) ? blob[0] : blob;
       }
 
@@ -90,15 +94,27 @@ export default function SplitPage() {
       setTitle(data.title || "Untitled");
       const parsedItems = data.items.map(
         (item: { name: string; price: number }) => ({
-          id: generateId(), name: item.name, price: item.price, assignedTo: [],
+          id: generateId(),
+          name: item.name,
+          price: item.price,
+          assignedTo: [],
         }),
       );
       setItems(parsedItems);
 
-      const itemsSubtotal = parsedItems.reduce((s: number, i: { price: number }) => s + i.price, 0);
+      const itemsSubtotal = parsedItems.reduce(
+        (s: number, i: { price: number }) => s + i.price,
+        0,
+      );
       if (itemsSubtotal > 0) {
-        if (data.tax != null) setTaxPercent(String(Math.round((data.tax / itemsSubtotal) * 1000) / 10));
-        if (data.tip != null) setTipPercent(String(Math.round((data.tip / itemsSubtotal) * 1000) / 10));
+        if (data.tax != null)
+          setTaxPercent(
+            String(Math.round((data.tax / itemsSubtotal) * 1000) / 10),
+          );
+        if (data.tip != null)
+          setTipPercent(
+            String(Math.round((data.tip / itemsSubtotal) * 1000) / 10),
+          );
       }
 
       if (data.receiptUrl) setReceiptUrl(data.receiptUrl);
@@ -126,35 +142,58 @@ export default function SplitPage() {
   const addPersonAuto = () => {
     let n = people.length + 1;
     let name = `Friend ${n}`;
-    while (people.includes(name)) { n++; name = `Friend ${n}`; }
+    while (people.includes(name)) {
+      n++;
+      name = `Friend ${n}`;
+    }
     setPeople([...people, name]);
   };
 
   const removePerson = (name: string) => {
     setPeople(people.filter((p) => p !== name));
-    setItems(items.map((item) => ({ ...item, assignedTo: item.assignedTo.filter((p) => p !== name) })));
+    setItems(
+      items.map((item) => ({
+        ...item,
+        assignedTo: item.assignedTo.filter((p) => p !== name),
+      })),
+    );
     if (activePerson === name) setActivePerson(null);
   };
 
   const renamePerson = (oldName: string, newName: string) => {
     setPeople(people.map((p) => (p === oldName ? newName : p)));
-    setItems(items.map((item) => ({ ...item, assignedTo: item.assignedTo.map((p) => (p === oldName ? newName : p)) })));
+    setItems(
+      items.map((item) => ({
+        ...item,
+        assignedTo: item.assignedTo.map((p) => (p === oldName ? newName : p)),
+      })),
+    );
     if (activePerson === oldName) setActivePerson(newName);
   };
 
   const toggleItemForActivePerson = (itemId: string) => {
     if (!activePerson) return;
-    setItems(items.map((item) => {
-      if (item.id !== itemId) return item;
-      const assigned = item.assignedTo.includes(activePerson)
-        ? item.assignedTo.filter((p) => p !== activePerson)
-        : [...item.assignedTo, activePerson];
-      return { ...item, assignedTo: assigned };
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.id !== itemId) return item;
+        const assigned = item.assignedTo.includes(activePerson)
+          ? item.assignedTo.filter((p) => p !== activePerson)
+          : [...item.assignedTo, activePerson];
+        return { ...item, assignedTo: assigned };
+      }),
+    );
   };
 
-  const updateItem = (id: string, field: "name" | "price", value: string | number) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+  const updateItem = (
+    id: string,
+    field: "name" | "price",
+    value: string | number,
+  ) => {
+    setItems(
+      items.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item,
+      ),
+    );
   };
 
   const removeItem = (id: string) => {
@@ -162,18 +201,33 @@ export default function SplitPage() {
   };
 
   const addItem = () => {
-    setItems([...items, { id: generateId(), name: "New Item", price: 0, assignedTo: [] }]);
+    setItems([
+      ...items,
+      { id: generateId(), name: "New Item", price: 0, assignedTo: [] },
+    ]);
   };
 
   const handleSplit = async () => {
-    if (people.length === 0) { setError("Add at least one person"); return; }
+    if (people.length === 0) {
+      setError("Add at least one person");
+      return;
+    }
     setPhase("saving");
     setError("");
     try {
       const res = await fetch("/api/splits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, items, people, taxPercent: taxVal, tipPercent: tipVal, subtotal, venmo, receiptUrl }),
+        body: JSON.stringify({
+          title,
+          items,
+          people,
+          taxPercent: taxVal,
+          tipPercent: tipVal,
+          subtotal,
+          venmo,
+          receiptUrl,
+        }),
       });
       if (!res.ok) throw new Error("Save failed");
       const data = await res.json();
@@ -200,7 +254,15 @@ export default function SplitPage() {
       const res = await fetch(`/api/splits/${splitId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, items, people, taxPercent: taxVal, tipPercent: tipVal, subtotal, venmo }),
+        body: JSON.stringify({
+          title,
+          items,
+          people,
+          taxPercent: taxVal,
+          tipPercent: tipVal,
+          subtotal,
+          venmo,
+        }),
       });
       if (!res.ok) throw new Error("Save failed");
       const url = window.location.href;
@@ -222,11 +284,20 @@ export default function SplitPage() {
 
   const personTotals = people.map((person) => {
     const personItems = items.filter((i) => i.assignedTo.includes(person));
-    const itemsTotal = personItems.reduce((s, i) => s + i.price / i.assignedTo.length, 0);
+    const itemsTotal = personItems.reduce(
+      (s, i) => s + i.price / i.assignedTo.length,
+      0,
+    );
     const proportion = subtotal > 0 ? itemsTotal / subtotal : 0;
     const tax = subtotal * (taxVal / 100) * proportion;
     const tip = subtotal * (tipVal / 100) * proportion;
-    return { name: person, itemsTotal, tax, tip, total: itemsTotal + tax + tip };
+    return {
+      name: person,
+      itemsTotal,
+      tax,
+      tip,
+      total: itemsTotal + tax + tip,
+    };
   });
 
   if (phase === "upload" || phase === "parsing" || phase === "uploaded") {
@@ -234,60 +305,142 @@ export default function SplitPage() {
       <Shell>
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-sm space-y-4">
-            <input ref={fileRef} type="file" accept="image/*" className="sr-only" aria-label="Upload receipt image"
-              onChange={(e) => { const file = e.target.files?.[0]; if (file) handleFile(file); }} />
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              aria-label="Upload receipt image"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFile(file);
+              }}
+            />
             <button
               onClick={() => fileRef.current?.click()}
               disabled={phase === "parsing"}
-              className="w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
+              className="cursor-pointer w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
             >
-              {phase === "parsing" ? <>Uploading<DotLoader /></> : phase === "uploaded" ? "Uploaded" : "Upload Receipt"}
+              {phase === "parsing" ? (
+                <>
+                  Uploading
+                  <DotLoader />
+                </>
+              ) : phase === "uploaded" ? (
+                "Uploaded"
+              ) : (
+                "Upload Receipt"
+              )}
             </button>
 
             {/* People input with badges */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 min-h-[28px]">
+            <div
+              className="relative flex flex-wrap items-center gap-x-3 gap-y-1 min-h-[28px] cursor-text"
+              onClick={() => personInputRef.current?.focus()}
+            >
+              {people.length === 0 && !newPerson && (
+                <span className="absolute inset-0 flex items-center text-base text-zinc-500 pointer-events-none">
+                  Who&apos;s involved?
+                </span>
+              )}
               {people.map((person) => (
-                <span key={person} className="inline-flex items-center gap-1 text-base text-zinc-700">
+                <span
+                  key={person}
+                  className="inline-flex items-center gap-1 text-base text-black"
+                >
                   {person}
                   <button
-                    onClick={() => { removePerson(person); setTimeout(() => personInputRef.current?.focus(), 0); }}
-                    className="text-zinc-400 hover:text-zinc-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removePerson(person);
+                      setTimeout(() => personInputRef.current?.focus(), 0);
+                    }}
+                    className="cursor-pointer text-md text-zinc-400 hover:text-zinc-500"
                   >
-                    ×
+                    x
                   </button>
                 </span>
               ))}
-              <input
+              <span
                 ref={personInputRef}
-                value={newPerson}
-                onChange={(e) => setNewPerson(e.target.value)}
+                role="textbox"
+                aria-label="Add person name"
+                contentEditable
+                suppressContentEditableWarning
+                tabIndex={0}
+                enterKeyHint="done"
+                onInput={(e) => {
+                  const text = (e.target as HTMLElement).textContent || "";
+                  setNewPerson(text);
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    addPersonByName();
+                    const el = e.target as HTMLElement;
+                    const name = el.textContent?.trim() || "";
+                    if (name && !people.includes(name)) {
+                      setPeople((prev) => [...prev, name]);
+                    }
+                    el.textContent = "";
+                    setNewPerson("");
+                  } else if (
+                    (e.key === "Backspace" || e.key === "Delete") &&
+                    !(e.target as HTMLElement).textContent &&
+                    people.length > 0
+                  ) {
+                    removePerson(people[people.length - 1]);
                   }
                 }}
-                onBlur={() => addPersonByName()}
-                enterKeyHint="done"
-                placeholder={people.length === 0 ? "Who's involved?" : ""}
-                className="flex-1 min-w-[80px] bg-transparent text-base text-zinc-900 outline-none"
+                onBlur={(e) => {
+                  const el = e.target as HTMLElement;
+                  const name = el.textContent?.trim() || "";
+                  if (name && !people.includes(name)) {
+                    setPeople((prev) => [...prev, name]);
+                  }
+                  el.textContent = "";
+                  setNewPerson("");
+                }}
+                className="flex-1 min-w-[80px] text-base text-zinc-900 outline-none"
               />
             </div>
 
             {/* Venmo */}
-            <div className="flex items-center gap-1 text-base">
+            <div className="relative flex items-center gap-1 text-base">
               <span className="text-zinc-500">@</span>
-              <input
-                value={venmo}
-                onChange={(e) => setVenmo(e.target.value)}
-                placeholder="venmo username"
-                className="flex-1 bg-transparent text-base text-zinc-900 outline-none"
-              />
+              <div className="relative flex-1">
+                {!venmo && (
+                  <span className="absolute inset-0 flex items-center text-zinc-500 pointer-events-none">
+                    venmo username
+                  </span>
+                )}
+                <span
+                  role="textbox"
+                  aria-label="Venmo username"
+                  contentEditable
+                  suppressContentEditableWarning
+                  onInput={(e) =>
+                    setVenmo((e.target as HTMLElement).textContent || "")
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      (e.target as HTMLElement).blur();
+                    }
+                  }}
+                  className="block w-full text-zinc-900 outline-none"
+                />
+              </div>
             </div>
 
             {/* Split button */}
             <button
-              onClick={() => { posthog.capture("split_started", { people_count: people.length, item_count: items.length }); handleSplit(); }}
+              onClick={() => {
+                posthog.capture("split_started", {
+                  people_count: people.length,
+                  item_count: items.length,
+                });
+                handleSplit();
+              }}
               disabled={phase !== "uploaded" || people.length === 0}
               className="w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
             >
@@ -310,24 +463,62 @@ export default function SplitPage() {
             description={venmo ? `@${venmo}` : undefined}
             onTitleChange={deepEdit ? setTitle : undefined}
             actionLabel={deepEdit ? "Done" : "Edit"}
-            onAction={() => { if (deepEdit) { setDeepEdit(false); setActivePerson(null); } else { setDeepEdit(true); setActivePerson(null); } }}
+            onAction={() => {
+              if (deepEdit) {
+                setDeepEdit(false);
+                setActivePerson(null);
+              } else {
+                setDeepEdit(true);
+                setActivePerson(null);
+              }
+            }}
             venmo={deepEdit ? venmo : undefined}
             onVenmoChange={deepEdit ? setVenmo : undefined}
           />
-          <PeopleList people={people} activePerson={activePerson} setActivePerson={setActivePerson}
-            removePerson={removePerson} addPerson={addPersonAuto}
-            deepEdit={deepEdit} onRenamePerson={renamePerson} />
-          <ItemsList items={items} people={people} activePerson={activePerson} setActivePerson={setActivePerson}
+          <PeopleList
+            people={people}
+            activePerson={activePerson}
+            setActivePerson={setActivePerson}
+            removePerson={removePerson}
+            addPerson={addPersonAuto}
+            deepEdit={deepEdit}
+            onRenamePerson={renamePerson}
+          />
+          <ItemsList
+            items={items}
+            people={people}
+            activePerson={activePerson}
+            setActivePerson={setActivePerson}
             toggleItemForActivePerson={toggleItemForActivePerson}
-            updateItem={updateItem} removeItem={removeItem} addItem={addItem}
-            deepEdit={deepEdit} />
-          <TotalsSection subtotal={subtotal} taxPercent={taxPercent} setTaxPercent={setTaxPercent}
-            tipPercent={tipPercent} setTipPercent={setTipPercent} taxVal={taxVal} tipVal={tipVal}
-            editable={deepEdit} />
+            updateItem={updateItem}
+            removeItem={removeItem}
+            addItem={addItem}
+            deepEdit={deepEdit}
+          />
+          <TotalsSection
+            subtotal={subtotal}
+            taxPercent={taxPercent}
+            setTaxPercent={setTaxPercent}
+            tipPercent={tipPercent}
+            setTipPercent={setTipPercent}
+            taxVal={taxVal}
+            tipVal={tipVal}
+            editable={deepEdit}
+          />
           <PerPersonSummary personTotals={personTotals} />
-          {error && <p className="text-red-600 text-base mb-4 text-center">{error}</p>}
-          <ActionButton onClick={handleSaveAndCopy} disabled={phase === "saving" || copied} className="mt-4">
-            {phase === "saving" ? "Saving..." : copied ? "Link Copied" : "Save and Copy Link"}
+          {error && (
+            <p className="text-red-600 text-base mb-4 text-center">{error}</p>
+          )}
+          <ActionButton
+            onClick={handleSaveAndCopy}
+            disabled={phase === "saving" || copied}
+            className="mt-4"
+          >
+            {phase === "saving"
+              ? "Saving..."
+              : copied
+                ? "Link Copied"
+                : "Save and Copy Link"}
           </ActionButton>
         </div>
       </div>

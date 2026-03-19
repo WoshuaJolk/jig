@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import Link from "next/link";
 import { SeoPageLayout } from "@/components/seo-page-layout";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo-config";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "How Jig Works - Split Receipts in 5 Easy Steps",
@@ -86,9 +86,7 @@ export default function HowItWorksPage() {
 
       <article className="space-y-12">
         <header>
-          <h1 className="text-4xl font-bold tracking-tight">
-            How Jig Works
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">How Jig Works</h1>
           <p className="mt-4 text-lg text-[#555]">
             Split any receipt in under two minutes. No app to download, no
             account to create. Here is how it works, step by step.
@@ -102,7 +100,9 @@ export default function HowItWorksPage() {
               1
             </span>
             <div>
-              <h2 className="text-2xl font-semibold">Upload Your Receipt</h2>
+              <h2 className="pt-2.5 text-2xl font-semibold">
+                Upload Your Receipt
+              </h2>
               <p className="mt-2">
                 Start by taking a photo of your receipt or uploading an existing
                 image. Jig works with photos from your phone camera, screenshots
@@ -124,12 +124,10 @@ export default function HowItWorksPage() {
                   table for a white receipt).
                 </li>
                 <li>
-                  Make sure the entire receipt is visible in the frame, including
-                  the totals at the bottom.
+                  Make sure the entire receipt is visible in the frame,
+                  including the totals at the bottom.
                 </li>
-                <li>
-                  Avoid harsh shadows or glare from overhead lights.
-                </li>
+                <li>Avoid harsh shadows or glare from overhead lights.</li>
                 <li>
                   If the receipt is long, you can take multiple photos or use a
                   panorama-style capture.
@@ -146,7 +144,7 @@ export default function HowItWorksPage() {
               2
             </span>
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="pt-2.5 text-2xl font-semibold">
                 AI Parses the Receipt
               </h2>
               <p className="mt-2">
@@ -159,8 +157,8 @@ export default function HowItWorksPage() {
                   receipt.
                 </li>
                 <li>
-                  <strong>Prices</strong> for each line item, including
-                  per-unit and total prices.
+                  <strong>Prices</strong> for each line item, including per-unit
+                  and total prices.
                 </li>
                 <li>
                   <strong>Quantities</strong> when multiple of the same item
@@ -199,7 +197,7 @@ export default function HowItWorksPage() {
               3
             </span>
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="pt-2.5 text-2xl font-semibold">
                 Add People to the Split
               </h2>
               <p className="mt-2">
@@ -242,7 +240,7 @@ export default function HowItWorksPage() {
               4
             </span>
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="pt-2.5 text-2xl font-semibold">
                 Assign Items to People
               </h2>
               <p className="mt-2">
@@ -293,7 +291,7 @@ export default function HowItWorksPage() {
               5
             </span>
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="pt-2.5 text-2xl font-semibold">
                 Share the Split Link
               </h2>
               <p className="mt-2">
@@ -302,15 +300,9 @@ export default function HowItWorksPage() {
                 or any messaging app. When they open the link, they will see:
               </p>
               <ul className="mt-2 list-disc space-y-1 pl-6">
-                <li>
-                  A clear breakdown of the items assigned to them.
-                </li>
-                <li>
-                  Their proportional share of tax and tip.
-                </li>
-                <li>
-                  Their total amount owed.
-                </li>
+                <li>A clear breakdown of the items assigned to them.</li>
+                <li>Their proportional share of tax and tip.</li>
+                <li>Their total amount owed.</li>
                 <li>
                   A one-tap Venmo payment link (if Venmo usernames were added).
                 </li>
@@ -321,17 +313,15 @@ export default function HowItWorksPage() {
                 browser, see what they owe, and pay up. It is that simple.
               </p>
               <p className="mt-2">
-                Split links remain active for 30 days, giving everyone plenty
-                of time to review and settle up.
+                Split links remain active for 30 days, giving everyone plenty of
+                time to review and settle up.
               </p>
             </div>
           </div>
         </section>
 
         <section className="space-y-4 rounded-lg border border-[#e5e3de] bg-white p-6">
-          <h2 className="text-xl font-semibold">
-            Why People Choose Jig
-          </h2>
+          <h2 className="text-xl font-semibold">Why People Choose Jig</h2>
           <ul className="list-disc space-y-2 pl-6">
             <li>
               <strong>Fast:</strong> Most splits take under two minutes from

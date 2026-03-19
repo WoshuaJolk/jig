@@ -1,11 +1,29 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Receipt Fallback";
+  src: local("Courier New"), local("Courier");
+  size-adjust: 88.28%;
+  ascent-override: 70.62%;
+  descent-override: 17.66%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Geist Mono Fallback";
+  src: local("Courier New"), local("Courier");
+  size-adjust: 85.27%;
+  ascent-override: 74.67%;
+  descent-override: 21.92%;
+  line-gap-override: 0%;
+}
+
 @theme inline {
   --color-background: #faf9f6;
   --color-foreground: #1a1a1a;
-  --font-receipt: var(--font-receipt), monospace;
+  --font-receipt: var(--font-receipt), "Receipt Fallback", monospace;
   --font-geist: var(--font-geist), sans-serif;
-  --font-geist-mono: var(--font-geist-mono), monospace;
+  --font-geist-mono: var(--font-geist-mono), "Geist Mono Fallback", monospace;
 }
 
 /* Shared content prose — applies to all SEO pages (about, faq, etc.) */
@@ -20,7 +38,7 @@
 .content-prose h2,
 .content-prose h3,
 .content-prose h4 {
-  font-family: var(--font-receipt), monospace;
+  font-family: var(--font-receipt), "Receipt Fallback", monospace;
   color: #1a1a1a;
   line-height: 1.25;
 }
@@ -52,7 +70,7 @@
   font-size: 0.9375rem;
 }
 .content-prose th {
-  font-family: var(--font-receipt), monospace;
+  font-family: var(--font-receipt), "Receipt Fallback", monospace;
   background: #f0ede8;
   padding: 0.625rem 0.875rem;
   text-align: left;
@@ -90,7 +108,7 @@
 .blog-prose h2,
 .blog-prose h3,
 .blog-prose h4 {
-  font-family: var(--font-receipt), monospace;
+  font-family: var(--font-receipt), "Receipt Fallback", monospace;
   color: #1a1a1a;
   line-height: 1.25;
 }
@@ -144,7 +162,7 @@
 }
 
 .blog-prose th {
-  font-family: var(--font-receipt), monospace;
+  font-family: var(--font-receipt), "Receipt Fallback", monospace;
   background: #f0ede8;
   padding: 0.625rem 0.875rem;
   text-align: left;
@@ -179,7 +197,7 @@ html:has(.shell-scroll-container) body {
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-receipt), monospace;
+  font-family: var(--font-receipt), "Receipt Fallback", monospace;
 }
 
 input,
