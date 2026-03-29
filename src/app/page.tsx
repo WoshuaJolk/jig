@@ -410,7 +410,7 @@ export default function SplitPage() {
               <div className="relative flex-1">
                 {!venmo && (
                   <span className="absolute inset-0 flex items-center text-zinc-500 pointer-events-none">
-                    venmo username
+                    your venmo username
                   </span>
                 )}
                 <span

@@ -54,7 +54,7 @@ export function PageHeader({
           <input
             value={"@" + (venmo || "")}
             onChange={(e) => onVenmoChange(e.target.value.replace(/^@/, ""))}
-            placeholder="@venmo username"
+            placeholder="@your venmo username"
             className="bg-transparent text-base text-zinc-400 outline-none text-center border-b border-dashed border-zinc-400 w-40"
           />
         </div>
