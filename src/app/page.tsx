@@ -3,9 +3,11 @@
 import { ActionButton } from "@/components/ActionButton";
 import { DotLoader } from "@/components/DotLoader";
 import { ItemsList } from "@/components/ItemsList";
+import { PageFooter, FooterLink } from "@/components/PageFooter";
 import { PageHeader } from "@/components/PageHeader";
 import { PeopleList } from "@/components/PeopleList";
 import { PerPersonSummary } from "@/components/PerPersonSummary";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Shell } from "@/components/shell";
 import { TotalsSection } from "@/components/TotalsSection";
 import { ReceiptItem } from "@/lib/types";
@@ -33,7 +35,7 @@ export default function SplitPage() {
   const [newPerson, setNewPerson] = useState("");
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const personInputRef = useRef<HTMLSpanElement>(null);
+  const personInputRef = useRef<HTMLInputElement>(null);
 
   const taxVal = num(taxPercent);
   const tipVal = num(tipPercent);
@@ -140,7 +142,7 @@ export default function SplitPage() {
   };
 
   const addPersonAuto = () => {
-    let n = people.length + 1;
+    let n = people.length;
     let name = `Friend ${n}`;
     while (people.includes(name)) {
       n++;
@@ -303,8 +305,13 @@ export default function SplitPage() {
   if (phase === "upload" || phase === "parsing" || phase === "uploaded") {
     return (
       <Shell>
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm space-y-4">
+        <div className="flex-1 p-4">
+          <div className="max-w-md mx-auto">
+            <PageHeader
+              title="Jig"
+              description="Split the bill"
+            />
+
             <input
               ref={fileRef}
               type="file"
@@ -316,124 +323,122 @@ export default function SplitPage() {
                 if (file) handleFile(file);
               }}
             />
-            <button
-              onClick={() => fileRef.current?.click()}
-              disabled={phase === "parsing"}
-              className="cursor-pointer w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
-            >
-              {phase === "parsing" ? (
-                <>
-                  Uploading
-                  <DotLoader />
-                </>
-              ) : phase === "uploaded" ? (
-                "Uploaded"
-              ) : (
-                "Upload Receipt"
-              )}
-            </button>
 
-            {/* People input with badges */}
-            <div
-              className="relative flex flex-wrap items-center gap-x-3 gap-y-1 min-h-[28px] cursor-text"
-              onClick={() => personInputRef.current?.focus()}
-            >
-              {people.length === 0 && !newPerson && (
-                <span className="absolute inset-0 flex items-center text-base text-zinc-500 pointer-events-none">
-                  Who&apos;s involved?
-                </span>
-              )}
-              {people.map((person) => (
-                <span
-                  key={person}
-                  className="inline-flex items-center gap-1 text-base text-black"
-                >
-                  {person}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removePerson(person);
-                      setTimeout(() => personInputRef.current?.focus(), 0);
-                    }}
-                    className="cursor-pointer text-md text-zinc-400 hover:text-zinc-500"
-                  >
-                    x
-                  </button>
-                </span>
-              ))}
-              <span
-                ref={personInputRef}
-                role="textbox"
-                aria-label="Add person name"
-                contentEditable
-                suppressContentEditableWarning
-                tabIndex={0}
-                enterKeyHint="done"
-                onInput={(e) => {
-                  const text = (e.target as HTMLElement).textContent || "";
-                  setNewPerson(text);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    const el = e.target as HTMLElement;
-                    const name = el.textContent?.trim() || "";
-                    if (name && !people.includes(name)) {
-                      setPeople((prev) => [...prev, name]);
-                    }
-                    el.textContent = "";
-                    setNewPerson("");
-                  } else if (
-                    (e.key === "Backspace" || e.key === "Delete") &&
-                    !(e.target as HTMLElement).textContent &&
-                    people.length > 0
-                  ) {
-                    removePerson(people[people.length - 1]);
-                  }
-                }}
-                onBlur={(e) => {
-                  const el = e.target as HTMLElement;
-                  const name = el.textContent?.trim() || "";
-                  if (name && !people.includes(name)) {
-                    setPeople((prev) => [...prev, name]);
-                  }
-                  el.textContent = "";
-                  setNewPerson("");
-                }}
-                className="flex-1 min-w-[80px] text-base text-zinc-900 outline-none"
-              />
+            {/* Receipt upload */}
+            <div className="mb-4">
+              <SectionHeader label="1. Add Receipt" />
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={phase === "parsing"}
+                className="cursor-pointer w-full text-base text-left text-zinc-900 disabled:text-zinc-400 underline"
+              >
+                {phase === "parsing" ? (
+                  <>
+                    Uploading
+                    <DotLoader />
+                  </>
+                ) : phase === "uploaded" ? (
+                  "Uploaded ✓"
+                ) : (
+                  "Upload image"
+                )}
+              </button>
             </div>
 
-            {/* Venmo */}
-            <div className="relative flex items-center gap-1 text-base">
-              <span className="text-zinc-500">@</span>
-              <div className="relative flex-1">
-                {!venmo && (
-                  <span className="absolute inset-0 flex items-center text-zinc-500 pointer-events-none">
-                    your venmo username
-                  </span>
-                )}
-                <span
-                  role="textbox"
-                  aria-label="Venmo username"
-                  contentEditable
-                  suppressContentEditableWarning
-                  onInput={(e) =>
-                    setVenmo((e.target as HTMLElement).textContent || "")
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      (e.target as HTMLElement).blur();
-                    }
-                  }}
-                  className="block w-full text-zinc-900 outline-none"
-                />
+            {/* People */}
+            <div className="mb-6">
+              <SectionHeader label="2. Add People" />
+              <div className="space-y-1.5">
+                {people.map((person) => (
+                  <div key={person} className="flex items-center gap-2">
+                    <button
+                      onClick={() => removePerson(person)}
+                      className="text-zinc-400 hover:text-red-500 text-sm font-bold flex-shrink-0 w-4 text-center"
+                    >
+                      &times;
+                    </button>
+                    <input
+                      value={person}
+                      onChange={(e) => renamePerson(person, e.target.value)}
+                      className="flex-1 bg-transparent text-base outline-none border-b border-dashed border-zinc-400"
+                    />
+                  </div>
+                ))}
+                <div className="flex items-center gap-2">
+                  <span className="text-zinc-400 text-sm font-bold flex-shrink-0 w-4 text-center">&times;</span>
+                  <input
+                    ref={personInputRef}
+                    value={newPerson}
+                    onChange={(e) => setNewPerson(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newPerson.trim()) {
+                          addPersonByName();
+                        } else {
+                          addPersonAuto();
+                        }
+                      } else if (
+                        (e.key === "Backspace" || e.key === "Delete") &&
+                        !newPerson &&
+                        people.length > 0
+                      ) {
+                        removePerson(people[people.length - 1]);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (newPerson.trim()) addPersonByName();
+                    }}
+                    placeholder={people.length === 0 ? "Your name" : `Friend ${people.length}`}
+                    className="flex-1 bg-transparent text-base outline-none border-b border-dashed border-zinc-400"
+                  />
+                </div>
+                <button
+                  onClick={addPersonAuto}
+                  className="text-xs text-zinc-400 hover:text-zinc-600 mt-2"
+                >
+                  + Add friend
+                </button>
               </div>
             </div>
 
+            {/* Venmo */}
+            <div className="mb-4">
+              <SectionHeader label="3. Add Venmo" />
+              <div className="relative flex items-center gap-1 text-base">
+                <span className="text-zinc-400">@</span>
+                <div className="relative flex-1">
+                  {!venmo && (
+                    <span className="absolute inset-0 flex items-center text-zinc-400 pointer-events-none">
+                      your username
+                    </span>
+                  )}
+                  <span
+                    role="textbox"
+                    aria-label="Venmo username"
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={(e) =>
+                      setVenmo((e.target as HTMLElement).textContent || "")
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        (e.target as HTMLElement).blur();
+                      }
+                    }}
+                    className="block w-full text-zinc-900 outline-none border-b border-dashed border-zinc-400"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <p className="text-red-600 text-base mb-4 text-center">{error}</p>
+            )}
+
             {/* Split button */}
-            <button
+            <ActionButton
               onClick={() => {
                 posthog.capture("split_started", {
                   people_count: people.length,
@@ -442,12 +447,10 @@ export default function SplitPage() {
                 handleSplit();
               }}
               disabled={phase !== "uploaded" || people.length === 0}
-              className="w-full text-base text-left text-zinc-900 disabled:text-zinc-400"
+              className="mt-2"
             >
-              Split
-            </button>
-
-            {error && <p className="text-red-600 text-base">{error}</p>}
+              {phase === "parsing" ? "Uploading..." : "Split"}
+            </ActionButton>
           </div>
         </div>
       </Shell>
