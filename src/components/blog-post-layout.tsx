@@ -23,7 +23,7 @@ export function BlogPostLayout({
   });
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] text-[#1a1a1a]">
+    <div className="min-h-screen bg-white text-[#1a1a1a]">
       <SeoHeader />
 
       <nav

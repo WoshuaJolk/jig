@@ -1,32 +1,20 @@
 "use client";
 
-import { PaperTexture } from "@paper-design/shaders-react";
-import { useEffect, useState } from "react";
+import Image from "next/image";
 
-export function BodyBg() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
+export function BodyBg({ onReady }: { onReady?: () => void }) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {mounted && <PaperTexture
-        colorBack="#faf9f6"
-        colorFront="#e0dbd4"
-        contrast={0.6}
-        roughness={0.3}
-        fiber={0.3}
-        fiberSize={0.2}
-        crumples={0.3}
-        crumpleSize={0.35}
-        folds={0.8}
-        foldCount={8}
-        drops={0}
-        fade={0}
-        seed={5.8}
-        scale={0.6}
-        fit="cover"
-        style={{ width: "100%", height: "100%" }}
-      />}
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <Image
+        src="/receipt.jpg"
+        alt=""
+        fill
+        className="object-cover opacity-40"
+        sizes="100vw"
+        priority
+        onLoadingComplete={onReady}
+        onError={onReady}
+      />
     </div>
   );
 }

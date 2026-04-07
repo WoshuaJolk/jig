@@ -19,7 +19,7 @@
 }
 
 @theme inline {
-  --color-background: #faf9f6;
+  --color-background: #ffffff;
   --color-foreground: #1a1a1a;
   --font-receipt: var(--font-receipt), "Receipt Fallback", monospace;
   --font-geist: var(--font-geist), sans-serif;
@@ -187,6 +187,7 @@
 html,
 body {
   height: 100%;
+  background-color: #ffffff;
 }
 
 html:has(.shell-scroll-container),
@@ -195,7 +196,6 @@ html:has(.shell-scroll-container) body {
 }
 
 body {
-  background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-receipt), "Receipt Fallback", monospace;
 }
